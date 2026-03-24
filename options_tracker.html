@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Active Options Tracker — $120K Mission</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #080c18; color: #c9d4e8; font-family: 'Segoe UI', system-ui, sans-serif; padding: 24px 20px 60px; }
+
+    /* ── Header / Nav ── */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .header h1 { font-size: 1.4rem; color: #fff; }
+    .header h1 span { color: #22d3ee; }
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .nav a { color: #22d3ee; font-size: 0.78rem; text-decoration: none; border: 1px solid #1e2744; padding: 5px 12px; border-radius: 20px; }
+    .nav a:hover { background: #0f1428; }
+    .nav a.active { background: #0e2a3a; border-color: #22d3ee; }
+
+    /* ── API Banner ── */
+    #api-banner {
+      background: #1a1f3a; border: 1px solid #2a3560; border-left: 4px solid #f59e0b;
+      border-radius: 8px; padding: 10px 16px; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    #api-banner label { font-size: 0.82rem; color: #f59e0b; white-space: nowrap; }
+    #api-key-input {
+      flex: 1; min-width: 200px; background: #0d1120; border: 1px solid #2a3560;
+      color: #e0e6f0; padding: 6px 10px; border-radius: 6px; font-size: 0.82rem; font-family: monospace;
+    }
+    #api-key-input:focus { outline: none; border-color: #22d3ee; }
+
+    /* ── Buttons ── */
+    .btn { padding: 7px 16px; border-radius: 7px; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: none; }
+    .btn-primary   { background: #22d3ee; color: #000; }
+    .btn-primary:hover { background: #06b6d4; }
+    .btn-secondary { background: #1e2744; color: #c9d4e8; border: 1px solid #2a3560; }
+    .btn-secondary:hover { background: #2a3560; }
+    .btn-sm { padding: 4px 10px; font-size: 0.75rem; border-radius: 5px; cursor: pointer; border: none; font-weight: 600; }
+
+    /* ── Summary Cards ── */
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 14px; margin-bottom: 24px; }
+    .card { background: #0f1428; border: 1px solid #1e2744; border-radius: 12px; padding: 16px 18px; }
+    .card .label { font-size: 0.7rem; color: #5a6a8a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .card .value { font-size: 1.45rem; font-weight: 700; }
+    .card .sub   { font-size: 0.72rem; color: #5a6a8a; margin-top: 4px; }
+    .c-green  { color: #22c55e; }
+    .c-cyan   { color: #22d3ee; }
+    .c-amber  { color: #f59e0b; }
+    .c-red    { color: #f87171; }
+    .c-purple { color: #c084fc; }
+    .c-white  { color: #fff; }
+
+    /* ── Section Title ── */
+    .section-title { font-size: 0.75rem; color: #5a6a8a; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: #1e2744; }
+
+    /* ── Position Cards ── */
+    .positions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; margin-bottom: 28px; }
+    .pos-card {
+      background: #0f1428; border: 1px solid #1e2744; border-radius: 14px; padding: 20px;
+      position: relative; transition: border-color 0.2s;
+    }
+    .pos-card.status-active   { border-left: 4px solid #22c55e; }
+    .pos-card.status-warning  { border-left: 4px solid #f59e0b; }
+    .pos-card.status-danger   { border-left: 4px solid #f87171; }
+    .pos-card.status-expired  { border-left: 4px solid #2a3560; opacity: 0.6; }
+
+    .pos-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .pos-ticker { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    .pos-type   { font-size: 0.7rem; color: #5a6a8a; margin-top: 2px; }
+    .pos-actions { display: flex; gap: 6px; }
+
+    .pos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-bottom: 14px; }
+    .pos-field .field-label { font-size: 0.65rem; color: #5a6a8a; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px; }
+    .pos-field .field-value { font-size: 0.9rem; color: #c9d4e8; font-weight: 600; }
+
+    /* DTE badge */
+    .dte-badge {
+      display: inline-block; font-size: 0.78rem; font-weight: 700; padding: 3px 10px;
+      border-radius: 20px; margin-bottom: 12px;
+    }
+    .dte-safe    { background: #0e3a1a; color: #86efac; }
+    .dte-watch   { background: #2a1e00; color: #fbbf24; }
+    .dte-urgent  { background: #3a0e0e; color: #fca5a5; }
+    .dte-expired { background: #1a1a2a; color: #3a4a6a; }
+
+    /* P&L bar */
+    .pnl-bar-wrap { margin-bottom: 12px; }
+    .pnl-bar-label { display: flex; justify-content: space-between; font-size: 0.73rem; margin-bottom: 4px; }
+    .pnl-track { background: #1a2040; border-radius: 999px; height: 8px; overflow: hidden; }
+    .pnl-fill  { height: 100%; border-radius: 999px; transition: width 0.4s; }
+    .pnl-green  { background: linear-gradient(90deg, #15803d, #22c55e); }
+    .pnl-amber  { background: linear-gradient(90deg, #92400e, #f59e0b); }
+    .pnl-red    { background: linear-gradient(90deg, #7f1d1d, #f87171); }
+
+    /* Live price row */
+    .live-row {
+      display: flex; align-items: center; gap: 8px;
+      background: #080c18; border: 1px solid #1a2040; border-radius: 8px;
+      padding: 8px 12px; font-size: 0.8rem; margin-bottom: 10px;
+    }
+    .live-price { font-weight: 700; font-size: 1rem; }
+    .live-change { font-size: 0.78rem; }
+    .live-status { font-size: 0.68rem; color: #3a4a6a; margin-left: auto; }
+
+    /* Risk panel */
+    .risk-panel {
+      border-radius: 8px; padding: 9px 12px; font-size: 0.78rem; line-height: 1.6;
+    }
+    .risk-otm   { background: #0e2a1a; border: 1px solid #166534; color: #86efac; }
+    .risk-close { background: #1a1800; border: 1px solid #4a3800; color: #fbbf24; }
+    .risk-itm   { background: #2a0e0e; border: 1px solid #7f1d1d; color: #fca5a5; }
+
+    /* ── Table (closed positions) ── */
+    .table-wrap { background: #0f1428; border: 1px solid #1e2744; border-radius: 12px; padding: 20px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th { text-align: left; padding: 8px 10px; color: #3a4a6a; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid #1e2744; }
+    td { padding: 9px 10px; border-bottom: 1px solid #111827; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #131a30; }
+    .align-right { text-align: right; }
+    tfoot td { border-top: 1px solid #2a3560; padding-top: 10px; font-weight: 700; color: #fff; }
+
+    /* Status badges */
+    .badge { display: inline-block; font-size: 0.68rem; padding: 2px 8px; border-radius: 4px; font-weight: 700; white-space: nowrap; }
+    .badge-active  { background: #0e3a1a; color: #86efac; }
+    .badge-otm     { background: #0e2a3a; color: #7dd3fc; }
+    .badge-rolled  { background: #2a1a44; color: #c084fc; }
+    .badge-itm     { background: #3a1a0e; color: #fca5a5; }
+
+    /* ── Modal ── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #0f1428; border: 1px solid #2a3560; border-radius: 14px; padding: 28px; width: 500px; max-width: 100%; max-height: 90vh; overflow-y: auto; }
+    .modal h3 { color: #fff; margin-bottom: 20px; font-size: 1rem; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.73rem; color: #8a9abc; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.8px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; background: #080c18; border: 1px solid #2a3560; color: #e0e6f0;
+      padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; font-family: inherit;
+    }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: #22d3ee; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 40px 20px; color: #2a3560;
+      border: 2px dashed #1a2040; border-radius: 12px; margin-bottom: 28px;
+    }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .empty-state p { font-size: 0.85rem; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+
+<!-- ════ HEADER ════ -->
+<div class="header">
+  <div>
+    <h1>⚙️ Active Options Tracker — <span>$120K Mission</span></h1>
+    <div style="font-size:0.75rem;color:#5a6a8a;margin-top:4px;">Real-time P&amp;L · DTE countdown · Assignment risk monitoring</div>
+  </div>
+  <div class="nav">
+    <a href="portfolio_dashboard.html">🏠 Dashboard</a>
+    <a href="premium_log.html">📋 Premium Log</a>
+    <a href="deployment_planner.html">💡 Investments</a>
+    <a href="cc_calculator.html">🧮 CC Calc</a>
+    <a href="portfolio_roadmap.html">🗺️ Roadmap</a>
+    <a href="options_tracker.html" class="active">⚙️ Options</a>
+    <a href="monthly_review.html">📊 Monthly Review</a>
+  </div>
+</div>
+
+<!-- ════ API KEY ════ -->
+<div id="api-banner">
+  <label>🔑 Finnhub API Key</label>
+  <input type="text" id="api-key-input" placeholder="Auto-loaded from Dashboard…" />
+  <button class="btn btn-primary" onclick="saveApiKey()">Save</button>
+  <button class="btn btn-secondary" onclick="refreshAllPrices()" style="margin-left:2px;">↻ Refresh Prices</button>
+  <span id="api-status" style="font-size:0.75rem;color:#5a6a8a;margin-left:4px;"></span>
+</div>
+
+<!-- ════ SUMMARY CARDS ════ -->
+<div class="cards">
+  <div class="card"><div class="label">Open Positions</div><div class="value c-amber" id="card-open">0</div><div class="sub">Active contracts</div></div>
+  <div class="card"><div class="label">Total Premium at Risk</div><div class="value c-cyan" id="card-premium">$0</div><div class="sub">In open positions</div></div>
+  <div class="card"><div class="label">Unrealized P&L</div><div class="value c-green" id="card-upnl">—</div><div class="sub">Mark to market</div></div>
+  <div class="card"><div class="label">Nearest Expiry</div><div class="value c-white" id="card-nearest">—</div><div class="sub" id="card-nearest-dte">DTE</div></div>
+  <div class="card"><div class="label">Assignment Risk</div><div class="value c-white" id="card-risk">—</div><div class="sub">Positions ITM</div></div>
+  <div class="card"><div class="label">Closed This Year</div><div class="value c-green" id="card-closed-pnl">$0</div><div class="sub">Realized premium</div></div>
+</div>
+
+<!-- ════ OPEN POSITIONS ════ -->
+<div class="section-title">Open Positions</div>
+<div id="open-positions-wrap">
+  <div class="empty-state" id="empty-state">
+    <div class="icon">📭</div>
+    <p>No open positions logged yet.<br>Add your first covered call contract below.</p>
+    <button class="btn btn-primary" onclick="openAddModal()">+ Add Position</button>
+  </div>
+  <div class="positions-grid" id="positions-grid" style="display:none;"></div>
+</div>
+<div style="margin-bottom:28px;">
+  <button class="btn btn-primary" onclick="openAddModal()" id="add-btn" style="display:none;">+ Add Position</button>
+</div>
+
+<!-- ════ CLOSED POSITIONS ════ -->
+<div id="closed-wrap" style="display:none;">
+  <div class="table-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div class="section-title" style="flex:1;margin-bottom:0;">Closed / Expired Positions</div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Strike</th>
+          <th>Expiry</th>
+          <th>Contracts</th>
+          <th class="align-right">Premium/Share</th>
+          <th class="align-right">Total Collected</th>
+          <th>Outcome</th>
+          <th>Notes</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="closed-tbody"></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="5">Total Realized Premium</td>
+          <td class="align-right c-green" id="closed-total">$0</td>
+          <td colspan="3"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<!-- ════ ADD / EDIT MODAL ════ -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Add Position</h3>
+    <input type="hidden" id="edit-id" value="">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Ticker (Underlying)</label>
+        <select id="f-ticker">
+          <option>RKLB</option>
+          <option>TSLA</option>
+          <option>OKLO</option>
+          <option>DKNG</option>
+          <option>WMT</option>
+          <option>SOFI</option>
+          <option value="__custom">Other…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Option Type</label>
+        <select id="f-type">
+          <option value="covered_call">Covered Call (Short)</option>
+          <option value="cash_secured_put">Cash-Secured Put (Short)</option>
+          <option value="long_call">Long Call</option>
+          <option value="long_put">Long Put</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="custom-ticker-wrap" style="display:none;" class="form-group">
+      <label>Custom Ticker</label>
+      <input type="text" id="f-custom-ticker" placeholder="e.g. IONQ" style="text-transform:uppercase;">
+    </div>
+
+    <div class="form-row3">
+      <div class="form-group">
+        <label>Strike Price ($)</label>
+        <input type="number" id="f-strike" step="0.50" placeholder="75.00">
+      </div>
+      <div class="form-group">
+        <label>Contracts</label>
+        <input type="number" id="f-contracts" value="5" min="1">
+      </div>
+      <div class="form-group">
+        <label>Premium / Share ($)</label>
+        <input type="number" id="f-premium" step="0.01" placeholder="4.82">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Open Date</label>
+        <input type="date" id="f-open">
+      </div>
+      <div class="form-group">
+        <label>Expiration Date</label>
+        <input type="date" id="f-expiry">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Avg Cost / Share ($)</label>
+        <input type="number" id="f-avgcost" step="0.01" placeholder="15.36" title="Your avg cost basis in the underlying">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="f-status">
+          <option value="open">🟢 Open / Active</option>
+          <option value="closed_otm">✅ Expired OTM (full premium)</option>
+          <option value="closed_rolled">🔄 Rolled</option>
+          <option value="closed_itm">⚠️ Expired ITM / Called Away</option>
+          <option value="closed_bought_back">💸 Bought Back Early</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Notes</label>
+      <input type="text" id="f-notes" placeholder="e.g. Rolled from $70, earnings play…">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="savePosition()">Save Position</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-secondary" id="btn-delete" onclick="deletePosition()" style="display:none;margin-left:auto;color:#f87171;border-color:#4a1a1a;">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ SCRIPT ════ -->
+<script>
+// ── Constants ─────────────────────────────────────────────────────
+const STORAGE_KEY = 'options_positions';
+const AVG_COSTS = {
+  RKLB: 15.36, OKLO: 32.77, TSLA: 224.52,
+  WMT: 79.13, DKNG: 31.94, SOFI: 27.32
+};
+
+// ── State ─────────────────────────────────────────────────────────
+let apiKey    = localStorage.getItem('finnhub_api_key') || '';
+let positions = loadPositions();
+let livePrices = {};
+
+// ── Load / Save ───────────────────────────────────────────────────
+function loadPositions() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) return JSON.parse(raw);
+  // Seed with Cycle 1 RKLB
+  return [{
+    id: 'pos_1',
+    ticker: 'RKLB',
+    type: 'covered_call',
+    strike: 75.00,
+    contracts: 5,
+    premium: 4.82,
+    avgCost: 15.36,
+    open: '2026-02-28',
+    expiry: '2026-04-02',
+    status: 'open',
+    notes: 'Cycle 1 — Geopolitical vol play',
+  }];
+}
+function savePositions() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(positions));
+}
+
+// ── API ───────────────────────────────────────────────────────────
+function saveApiKey() {
+  apiKey = document.getElementById('api-key-input').value.trim();
+  if (apiKey) { localStorage.setItem('finnhub_api_key', apiKey); }
+  refreshAllPrices();
+}
+
+async function fetchPrice(ticker) {
+  if (!apiKey) return null;
+  try {
+    const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`;
+    const resp = await fetch(url);
+    if (!resp.ok) return null;
+    const d = await resp.json();
+    return (d && typeof d.c === 'number' && d.c > 0) ? { price: d.c, change: d.dp } : null;
+  } catch { return null; }
+}
+
+async function refreshAllPrices() {
+  if (!apiKey) { setStatus('⚠ No API key', '#f59e0b'); return; }
+  setStatus('⏳ Fetching…', '#22d3ee');
+  const openTickers = [...new Set(positions.filter(p => p.status === 'open').map(p => p.ticker))];
+  await Promise.allSettled(openTickers.map(async t => {
+    const data = await fetchPrice(t);
+    if (data) livePrices[t] = data;
+  }));
+  setStatus('✓ Prices loaded — ' + new Date().toLocaleTimeString(), '#22c55e');
+  render();
+}
+
+function setStatus(msg, color) {
+  const el = document.getElementById('api-status');
+  el.textContent = msg;
+  el.style.color  = color;
+}
+
+// ── Render ────────────────────────────────────────────────────────
+function render() {
+  const open   = positions.filter(p => p.status === 'open');
+  const closed = positions.filter(p => p.status !== 'open');
+
+  renderSummaryCards(open, closed);
+  renderOpenPositions(open);
+  renderClosedTable(closed);
+}
+
+function renderSummaryCards(open, closed) {
+  document.getElementById('card-open').textContent = open.length;
+
+  const totalPremium = open.reduce((s, p) => s + p.premium * p.contracts * 100, 0);
+  document.getElementById('card-premium').textContent = '$' + totalPremium.toLocaleString();
+
+  // Unrealized P&L on short calls: premium received - current option value (approx)
+  // We approximate current option value using intrinsic + a simple proxy
+  let totalUpnl = 0;
+  let upnlValid = false;
+  open.forEach(p => {
+    const live = livePrices[p.ticker];
+    if (live && p.type === 'covered_call') {
+      const intrinsic = Math.max(0, live.price - p.strike);
+      const timeVal   = Math.max(0.05, p.premium * 0.1); // rough floor
+      const currentVal = intrinsic + timeVal;
+      const pnlPerShare = p.premium - currentVal;
+      totalUpnl += pnlPerShare * p.contracts * 100;
+      upnlValid = true;
+    }
+  });
+  const upnlEl = document.getElementById('card-upnl');
+  if (upnlValid) {
+    upnlEl.textContent = (totalUpnl >= 0 ? '+' : '') + '$' + Math.round(totalUpnl).toLocaleString();
+    upnlEl.className   = 'value ' + (totalUpnl >= 0 ? 'c-green' : 'c-red');
+  } else {
+    upnlEl.textContent = '—';
+    upnlEl.className   = 'value c-white';
+  }
+
+  // Nearest expiry
+  if (open.length > 0) {
+    const soonest = open.reduce((a, b) => a.expiry < b.expiry ? a : b);
+    const dte = getDTE(soonest.expiry);
+    document.getElementById('card-nearest').textContent    = soonest.ticker + ' $' + soonest.strike;
+    document.getElementById('card-nearest-dte').textContent = dte + ' days remaining';
+  } else {
+    document.getElementById('card-nearest').textContent     = '—';
+    document.getElementById('card-nearest-dte').textContent = 'No open positions';
+  }
+
+  // Assignment risk
+  let itmCount = 0;
+  open.forEach(p => {
+    const live = livePrices[p.ticker];
+    if (live && p.type === 'covered_call' && live.price > p.strike) itmCount++;
+  });
+  const riskEl = document.getElementById('card-risk');
+  riskEl.textContent = itmCount === 0 ? 'All OTM ✓' : `${itmCount} ITM ⚠`;
+  riskEl.className   = 'value ' + (itmCount === 0 ? 'c-green' : 'c-red');
+
+  // Closed P&L
+  const closedPnl = closed.reduce((s, p) => s + p.premium * p.contracts * 100, 0);
+  document.getElementById('card-closed-pnl').textContent = '$' + closedPnl.toLocaleString();
+}
+
+function renderOpenPositions(open) {
+  const grid  = document.getElementById('positions-grid');
+  const empty = document.getElementById('empty-state');
+  const addBtn = document.getElementById('add-btn');
+
+  if (open.length === 0) {
+    grid.style.display  = 'none';
+    empty.style.display = 'block';
+    addBtn.style.display = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+  grid.style.display  = 'grid';
+  addBtn.style.display = 'inline-block';
+  grid.innerHTML = '';
+
+  open.forEach(p => {
+    const dte      = getDTE(p.expiry);
+    const totalPrem = p.premium * p.contracts * 100;
+    const live     = livePrices[p.ticker];
+    const livePrice = live ? live.price : null;
+    const liveChange = live ? live.change : null;
+
+    // Status classification
+    let cardStatus = 'active';
+    let riskText   = '';
+    let riskClass  = 'risk-otm';
+    let dteClass   = 'dte-safe';
+    let pnlFillClass = 'pnl-green';
+    let pnlPct = 100;
+
+    if (dte <= 0) {
+      cardStatus = 'expired';
+      dteClass   = 'dte-expired';
+    } else if (dte <= 7) {
+      cardStatus = 'danger';
+      dteClass   = 'dte-urgent';
+    } else if (dte <= 21) {
+      cardStatus = 'warning';
+      dteClass   = 'dte-watch';
+    }
+
+    if (livePrice !== null && p.type === 'covered_call') {
+      const pctFromStrike = ((livePrice - p.strike) / p.strike) * 100;
+      if (livePrice > p.strike) {
+        riskClass = 'risk-itm';
+        riskText  = `⚠️ ITM — stock at $${livePrice.toFixed(2)} is $${(livePrice - p.strike).toFixed(2)} above $${p.strike} strike (+${pctFromStrike.toFixed(1)}%). Assignment risk if held to expiry.`;
+        cardStatus = 'danger';
+        pnlFillClass = 'pnl-red';
+        pnlPct = Math.min(100, Math.abs(pctFromStrike) * 5);
+      } else {
+        const pctBelow = ((p.strike - livePrice) / p.strike) * 100;
+        if (pctBelow < 5) {
+          riskClass = 'risk-close';
+          riskText  = `👀 Approaching strike — stock at $${livePrice.toFixed(2)} is ${pctBelow.toFixed(1)}% below $${p.strike} strike. Monitor closely.`;
+          if (cardStatus !== 'danger') cardStatus = 'warning';
+          pnlFillClass = 'pnl-amber';
+          pnlPct = Math.min(100, (5 - pctBelow) * 20);
+        } else {
+          riskText  = `✅ OTM — stock at $${livePrice.toFixed(2)} is ${pctBelow.toFixed(1)}% below $${p.strike} strike. Premium should expire worthless.`;
+          pnlPct = Math.min(100, pctBelow * 3);
+        }
+      }
+    } else if (!livePrice) {
+      riskText = 'Refresh prices to see live risk assessment.';
+      riskClass = '';
+    }
+
+    // Break-even
+    const breakeven = p.avgCost > 0 ? (p.avgCost - p.premium).toFixed(2) : '—';
+
+    // Annualized return
+    const openDate   = new Date(p.open);
+    const expiryDate = new Date(p.expiry);
+    const cycleDays  = Math.max(1, (expiryDate - openDate) / 86400000);
+    const annReturn  = ((p.premium / p.strike) * (365 / cycleDays) * 100).toFixed(1);
+
+    // Change display
+    let changeHtml = '';
+    if (liveChange !== null && liveChange !== undefined) {
+      const sign = liveChange >= 0 ? '+' : '';
+      const cls  = liveChange >= 0 ? 'c-green' : 'c-red';
+      changeHtml = `<span class="${cls} live-change">${sign}${liveChange.toFixed(2)}% today</span>`;
+    }
+
+    const dteLabel = dte <= 0 ? 'EXPIRED' : `${dte} DTE`;
+
+    const idx = positions.indexOf(p);
+    grid.innerHTML += `
+      <div class="pos-card status-${cardStatus}">
+        <div class="pos-header">
+          <div>
+            <div class="pos-ticker">${p.ticker}</div>
+            <div class="pos-type">${typeLabel(p.type)} · ${p.contracts} contract${p.contracts !== 1 ? 's' : ''} · ${formatDate(p.open)} → ${formatDate(p.expiry)}</div>
+          </div>
+          <div class="pos-actions">
+            <button class="btn btn-sm btn-secondary" onclick="openEditModal('${p.id}')">Edit</button>
+            <button class="btn btn-sm" style="background:#1a3a1a;color:#22c55e;border:none;" onclick="closePosition('${p.id}')">Close</button>
+          </div>
+        </div>
+
+        ${livePrice !== null ? `
+        <div class="live-row">
+          <span style="color:#5a6a8a;font-size:0.7rem;">LIVE</span>
+          <span class="live-price">$${livePrice.toFixed(2)}</span>
+          ${changeHtml}
+          <span class="live-status">↻ ${new Date().toLocaleTimeString()}</span>
+        </div>` : `
+        <div class="live-row" style="color:#2a3560;">
+          <span>No live price — refresh above</span>
+        </div>`}
+
+        <div class="dte-badge ${dteClass}">${dteLabel}</div>
+
+        <div class="pos-grid">
+          <div class="pos-field">
+            <div class="field-label">Strike</div>
+            <div class="field-value">$${p.strike.toFixed(2)}</div>
+          </div>
+          <div class="pos-field">
+            <div class="field-label">Premium / Share</div>
+            <div class="field-value c-green">$${p.premium.toFixed(2)}</div>
+          </div>
+          <div class="pos-field">
+            <div class="field-label">Total Collected</div>
+            <div class="field-value c-green">$${totalPrem.toLocaleString()}</div>
+          </div>
+          <div class="pos-field">
+            <div class="field-label">Annualized Return</div>
+            <div class="field-value c-cyan">${annReturn}%</div>
+          </div>
+          <div class="pos-field">
+            <div class="field-label">Avg Cost Basis</div>
+            <div class="field-value">$${p.avgCost ? p.avgCost.toFixed(2) : '—'}</div>
+          </div>
+          <div class="pos-field">
+            <div class="field-label">Break-even</div>
+            <div class="field-value">$${breakeven}</div>
+          </div>
+        </div>
+
+        ${livePrice !== null ? `
+        <div class="pnl-bar-wrap">
+          <div class="pnl-bar-label">
+            <span style="color:#5a6a8a;font-size:0.7rem;">Stock vs Strike (${((livePrice / p.strike) * 100).toFixed(1)}%)</span>
+            <span style="font-size:0.7rem;color:${livePrice > p.strike ? '#f87171' : '#22c55e'};">${livePrice > p.strike ? 'ITM ⚠' : 'OTM ✓'}</span>
+          </div>
+          <div class="pnl-track">
+            <div class="pnl-fill ${pnlFillClass}" style="width:${Math.min(100, (livePrice / p.strike) * 100)}%;"></div>
+          </div>
+        </div>` : ''}
+
+        ${riskText ? `<div class="risk-panel ${riskClass}">${riskText}</div>` : ''}
+
+        ${p.notes ? `<div style="margin-top:10px;font-size:0.75rem;color:#5a6a8a;">📝 ${p.notes}</div>` : ''}
+      </div>`;
+  });
+}
+
+function renderClosedTable(closed) {
+  const wrap  = document.getElementById('closed-wrap');
+  const tbody = document.getElementById('closed-tbody');
+  if (closed.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  tbody.innerHTML = '';
+
+  const statusMap = {
+    closed_otm:         '<span class="badge badge-otm">✅ Expired OTM</span>',
+    closed_rolled:      '<span class="badge badge-rolled">🔄 Rolled</span>',
+    closed_itm:         '<span class="badge badge-itm">⚠️ Called Away</span>',
+    closed_bought_back: '<span class="badge" style="background:#1a1a2a;color:#9ca3af;">💸 Closed Early</span>',
+  };
+
+  let closedTotal = 0;
+  closed.forEach(p => {
+    const total = p.premium * p.contracts * 100;
+    closedTotal += total;
+    tbody.innerHTML += `
+      <tr>
+        <td><strong style="color:#fff;">${p.ticker}</strong></td>
+        <td>$${p.strike.toFixed(2)}</td>
+        <td>${formatDate(p.expiry)}</td>
+        <td>${p.contracts}×</td>
+        <td class="align-right" style="color:#22c55e;">$${p.premium.toFixed(2)}</td>
+        <td class="align-right" style="color:#22c55e;font-weight:700;">$${total.toLocaleString()}</td>
+        <td>${statusMap[p.status] || ''}</td>
+        <td style="color:#5a6a8a;font-size:0.75rem;">${p.notes || '—'}</td>
+        <td><button class="btn btn-sm btn-secondary" onclick="openEditModal('${p.id}')">Edit</button></td>
+      </tr>`;
+  });
+  document.getElementById('closed-total').textContent = '$' + closedTotal.toLocaleString();
+}
+
+// ── Modal ─────────────────────────────────────────────────────────
+function openAddModal() {
+  document.getElementById('modal-title').textContent = 'Add Position';
+  document.getElementById('edit-id').value = '';
+  document.getElementById('f-ticker').value    = 'RKLB';
+  document.getElementById('f-type').value      = 'covered_call';
+  document.getElementById('f-strike').value    = '';
+  document.getElementById('f-contracts').value = 5;
+  document.getElementById('f-premium').value   = '';
+  document.getElementById('f-avgcost').value   = AVG_COSTS['RKLB'] || '';
+  document.getElementById('f-open').value      = todayStr();
+  document.getElementById('f-expiry').value    = '';
+  document.getElementById('f-status').value    = 'open';
+  document.getElementById('f-notes').value     = '';
+  document.getElementById('custom-ticker-wrap').style.display = 'none';
+  document.getElementById('btn-delete').style.display = 'none';
+  document.getElementById('modal').classList.add('open');
+}
+
+function openEditModal(id) {
+  const p = positions.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modal-title').textContent = 'Edit Position — ' + p.ticker;
+  document.getElementById('edit-id').value      = p.id;
+  document.getElementById('f-ticker').value     = ['RKLB','TSLA','OKLO','DKNG','WMT','SOFI'].includes(p.ticker) ? p.ticker : '__custom';
+  document.getElementById('f-type').value       = p.type;
+  document.getElementById('f-strike').value     = p.strike;
+  document.getElementById('f-contracts').value  = p.contracts;
+  document.getElementById('f-premium').value    = p.premium;
+  document.getElementById('f-avgcost').value    = p.avgCost || '';
+  document.getElementById('f-open').value       = p.open;
+  document.getElementById('f-expiry').value     = p.expiry;
+  document.getElementById('f-status').value     = p.status;
+  document.getElementById('f-notes').value      = p.notes || '';
+  if (!['RKLB','TSLA','OKLO','DKNG','WMT','SOFI'].includes(p.ticker)) {
+    document.getElementById('custom-ticker-wrap').style.display = 'block';
+    document.getElementById('f-custom-ticker').value = p.ticker;
+  } else {
+    document.getElementById('custom-ticker-wrap').style.display = 'none';
+  }
+  document.getElementById('btn-delete').style.display = 'inline-block';
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+function savePosition() {
+  const id = document.getElementById('edit-id').value;
+  let ticker = document.getElementById('f-ticker').value;
+  if (ticker === '__custom') ticker = document.getElementById('f-custom-ticker').value.trim().toUpperCase();
+  if (!ticker) { alert('Please enter a ticker.'); return; }
+
+  const strike   = parseFloat(document.getElementById('f-strike').value);
+  const premium  = parseFloat(document.getElementById('f-premium').value);
+  if (!strike || !premium) { alert('Strike and Premium are required.'); return; }
+
+  const p = {
+    id:        id || 'pos_' + Date.now(),
+    ticker,
+    type:      document.getElementById('f-type').value,
+    strike,
+    contracts: parseInt(document.getElementById('f-contracts').value) || 1,
+    premium,
+    avgCost:   parseFloat(document.getElementById('f-avgcost').value) || AVG_COSTS[ticker] || 0,
+    open:      document.getElementById('f-open').value,
+    expiry:    document.getElementById('f-expiry').value,
+    status:    document.getElementById('f-status').value,
+    notes:     document.getElementById('f-notes').value.trim(),
+  };
+
+  if (id) {
+    const idx = positions.findIndex(x => x.id === id);
+    if (idx >= 0) positions[idx] = p;
+  } else {
+    positions.push(p);
+  }
+  savePositions();
+  render();
+  closeModal();
+}
+
+function deletePosition() {
+  const id = document.getElementById('edit-id').value;
+  if (!id || !confirm('Delete this position?')) return;
+  positions = positions.filter(x => x.id !== id);
+  savePositions();
+  render();
+  closeModal();
+}
+
+function closePosition(id) {
+  // Quick-close: mark as expired OTM
+  const p = positions.find(x => x.id === id);
+  if (!p) return;
+  const choice = confirm(`Mark ${p.ticker} $${p.strike} as "Expired OTM"?\n\nClick Cancel to choose a different outcome.`);
+  if (choice) {
+    p.status = 'closed_otm';
+    savePositions();
+    render();
+  } else {
+    openEditModal(id);
+  }
+}
+
+// ── Ticker change handler (auto-fill avg cost) ────────────────────
+document.getElementById('f-ticker').addEventListener('change', function() {
+  const custom = document.getElementById('custom-ticker-wrap');
+  custom.style.display = this.value === '__custom' ? 'block' : 'none';
+  if (AVG_COSTS[this.value]) {
+    document.getElementById('f-avgcost').value = AVG_COSTS[this.value];
+  }
+});
+
+// ── Helpers ───────────────────────────────────────────────────────
+function getDTE(expiryStr) {
+  if (!expiryStr) return 0;
+  const now   = new Date();
+  now.setHours(0,0,0,0);
+  const exp   = new Date(expiryStr + 'T00:00:00');
+  return Math.ceil((exp - now) / 86400000);
+}
+function formatDate(d) {
+  if (!d) return '—';
+  const [y, m, day] = d.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
+}
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function typeLabel(t) {
+  return { covered_call: 'Covered Call', cash_secured_put: 'CSP', long_call: 'Long Call', long_put: 'Long Put' }[t] || t;
+}
+
+// Close modal on overlay click
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ── Init ──────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  if (apiKey) {
+    document.getElementById('api-key-input').value = apiKey;
+    document.getElementById('api-status').textContent = '✓ Key loaded';
+  }
+  render();
+  if (apiKey) refreshAllPrices();
+});
+</script>
+</body>
+</html>

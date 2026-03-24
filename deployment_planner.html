@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Potential Investments — $120K Mission</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #080c18; color: #c9d4e8; font-family: 'Segoe UI', system-ui, sans-serif; padding: 24px 20px 60px; }
+
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+    .header h1 { font-size: 1.4rem; color: #fff; }
+    .header h1 span { color: #22d3ee; }
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .nav a { color: #22d3ee; font-size: 0.78rem; text-decoration: none; border: 1px solid #1e2744; padding: 5px 12px; border-radius: 20px; }
+    .nav a:hover { background: #0f1428; }
+
+    .section-title { font-size: 0.75rem; color: #5a6a8a; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: #1e2744; }
+
+    /* API bar */
+    .api-bar { background: #1a1f3a; border: 1px solid #2a3560; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .api-bar label { font-size: 0.8rem; color: #f59e0b; white-space: nowrap; }
+    .api-bar input[type=text] { flex:1; min-width: 180px; background: #080c18; border: 1px solid #2a3560; color: #e0e6f0; padding: 6px 10px; border-radius: 6px; font-size: 0.82rem; font-family: monospace; }
+    .btn-sm  { background: #22d3ee; color: #000; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    .btn-sm:hover { background: #06b6d4; }
+    .btn-ghost { background: #1e2744; color: #22d3ee; border: 1px solid #2a3560; padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
+    .btn-ghost:hover { background: #2a3560; }
+    #api-status { font-size: 0.75rem; color: #5a6a8a; }
+
+    /* Amount section */
+    .amount-section { background: #0f1428; border: 1px solid #1e2744; border-radius: 12px; padding: 22px 26px; margin-bottom: 20px; }
+    .amount-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+    .amount-input-wrap { position: relative; }
+    .amount-input-wrap span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #5a6a8a; font-size: 1.2rem; font-weight: 700; }
+    .amount-input-wrap input { background: #080c18; border: 2px solid #2a3560; color: #fff; padding: 12px 16px 12px 32px; border-radius: 10px; font-size: 1.4rem; font-weight: 700; width: 200px; }
+    .amount-input-wrap input:focus { outline: none; border-color: #22d3ee; }
+    .quick-amounts { display: flex; gap: 8px; flex-wrap: wrap; }
+    .qa-btn { background: #0f1428; border: 1px solid #1e2744; color: #8a9abc; padding: 6px 14px; border-radius: 20px; font-size: 0.78rem; cursor: pointer; }
+    .qa-btn:hover { border-color: #22d3ee; color: #22d3ee; }
+    .unallocated-badge { font-size: 0.82rem; padding: 6px 14px; border-radius: 8px; font-weight: 600; }
+    .badge-ok   { background: #0e2a1a; color: #86efac; }
+    .badge-warn { background: #1a1a2a; color: #5a6a8a; }
+    .badge-over { background: #3a1a0e; color: #f87171; }
+
+    /* Recommend button & panel */
+    .rec-btn { background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff; border: none; padding: 10px 22px; border-radius: 10px; font-size: 0.88rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .rec-btn:hover { opacity: 0.9; }
+    .rec-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .rec-panel { background: #0a0f20; border: 1px solid #2a3a6a; border-left: 4px solid #6366f1; border-radius: 12px; padding: 20px 22px; margin-bottom: 24px; display: none; }
+    .rec-panel.show { display: block; }
+    .rec-panel h3 { font-size: 0.9rem; color: #a5b4fc; margin-bottom: 14px; }
+    .rec-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid #111827; }
+    .rec-row:last-child { border-bottom: none; }
+    .rec-ticker { font-size: 0.95rem; font-weight: 800; color: #fff; min-width: 60px; }
+    .rec-pct { font-size: 1.1rem; font-weight: 700; color: #22d3ee; min-width: 50px; }
+    .rec-amount { font-size: 0.82rem; color: #22c55e; font-weight: 700; min-width: 70px; }
+    .rec-reason { font-size: 0.78rem; color: #8a9abc; line-height: 1.55; }
+    .rec-reason strong { color: #c9d4e8; }
+    .apply-rec-btn { margin-top: 14px; background: #22d3ee; color: #000; border: none; padding: 8px 18px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+    .apply-rec-btn:hover { background: #06b6d4; }
+
+    /* Cards grid */
+    .candidates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 24px; }
+
+    .candidate-card { background: #0f1428; border: 2px solid #1e2744; border-radius: 12px; padding: 18px; cursor: pointer; transition: border-color 0.15s; position: relative; }
+    .candidate-card.selected     { border-color: #22d3ee; background: #0a1420; }
+    .candidate-card.selected-avg { border-color: #22c55e; background: #0a180a; }
+    .candidate-card:hover:not(.selected):not(.selected-avg) { border-color: #2a3a60; }
+
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .card-ticker { font-size: 1.15rem; font-weight: 800; color: #fff; }
+    .card-name   { font-size: 0.72rem; color: #5a6a8a; margin-top: 2px; }
+    .card-price .cp  { font-size: 1.1rem; font-weight: 700; color: #22d3ee; text-align: right; }
+    .card-price .chg { font-size: 0.7rem; text-align: right; }
+    .pos { color: #22c55e; } .neg { color: #f87171; }
+
+    .card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+    .tag { font-size: 0.62rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; }
+    .tag-existing   { background: #0e3a2a; color: #6ee7b7; }
+    .tag-new        { background: #1e1040; color: #c084fc; }
+    .tag-avgdown    { background: #3a1a0e; color: #fca5a5; }
+    .tag-accumulate { background: #0e2a3a; color: #7dd3fc; }
+    .tag-winner     { background: #1a3a0e; color: #86efac; }
+    .tag-defensive  { background: #1a1a3a; color: #93c5fd; }
+    .tag-quantum    { background: #2a0e3a; color: #e879f9; }
+    .tag-saas       { background: #1a2a0e; color: #a3e635; }
+
+    .card-stat { font-size: 0.78rem; color: #8a9abc; line-height: 1.65; }
+    .card-stat strong { color: #c9d4e8; }
+    .card-stat .underwater { color: #f87171; }
+    .card-stat .green { color: #22c55e; }
+
+    /* Alloc row */
+    .alloc-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #1a2040; }
+    .alloc-row label { font-size: 0.7rem; color: #5a6a8a; white-space: nowrap; }
+    .alloc-input { width: 80px; background: #080c18; border: 1px solid #2a3560; color: #fff; padding: 5px 8px; border-radius: 6px; font-size: 0.88rem; text-align: right; font-weight: 700; }
+    .alloc-input:focus { outline: none; border-color: #22d3ee; }
+    .alloc-result { font-size: 0.78rem; color: #22d3ee; font-weight: 600; }
+
+    /* Outcome box */
+    .outcome-box { background: #080c18; border: 1px solid #1a2040; border-radius: 8px; padding: 8px 12px; margin-top: 8px; font-size: 0.75rem; color: #8a9abc; line-height: 1.7; display: none; }
+    .outcome-box.show { display: block; }
+    .outcome-box strong { color: #22d3ee; }
+    .outcome-box .improvement { color: #22c55e; font-weight: 700; }
+
+    /* Earnings section */
+    .earnings-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid #1a2040; display: none; }
+    .earnings-section.show { display: block; }
+    .earnings-header { font-size: 0.7rem; color: #5a6a8a; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .earnings-loading { font-size: 0.75rem; color: #3a4a6a; font-style: italic; }
+    .earnings-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+    .earnings-table th { color: #3a4a6a; padding: 4px 6px; text-align: right; font-weight: 600; border-bottom: 1px solid #1a2040; }
+    .earnings-table th:first-child { text-align: left; }
+    .earnings-table td { padding: 5px 6px; text-align: right; border-bottom: 1px solid #0d1020; color: #c9d4e8; }
+    .earnings-table td:first-child { text-align: left; color: #8a9abc; }
+    .earnings-table tr:last-child td { border-bottom: none; }
+    .beat { color: #22c55e; font-weight: 700; }
+    .miss { color: #f87171; font-weight: 700; }
+    .inline-badge { font-size: 0.6rem; padding: 1px 5px; border-radius: 3px; margin-left: 4px; font-weight: 700; }
+    .beat-badge { background: #0e2a1a; color: #86efac; }
+    .miss-badge { background: #2a0e0e; color: #fca5a5; }
+    .in-line-badge { background: #1a1a2a; color: #8a9abc; }
+
+    /* Remove button on card */
+    .card-remove { position: absolute; top: 10px; right: 10px; background: none; border: 1px solid #2a3560; color: #3a4a6a; width: 22px; height: 22px; border-radius: 50%; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; z-index: 2; }
+    .card-remove:hover { border-color: #f87171; color: #f87171; background: #1a0808; }
+
+    /* Add custom */
+    .add-custom { background: #0f1428; border: 2px dashed #1e2744; border-radius: 12px; padding: 16px 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+    .add-custom:hover { border-color: #2a3a60; }
+    .add-custom input { background: #080c18; border: 1px solid #2a3560; color: #fff; padding: 7px 12px; border-radius: 8px; font-size: 0.85rem; width: 120px; text-transform: uppercase; }
+    .add-custom input:focus { outline: none; border-color: #22d3ee; }
+
+    /* Controls row */
+    .controls-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+    .controls-row span { font-size: 0.78rem; color: #5a6a8a; }
+
+    /* Summary table */
+    .summary-section { background: #0f1428; border: 1px solid #1e2744; border-radius: 12px; padding: 22px; }
+    table.sum-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    table.sum-table th { text-align: left; padding: 8px 10px; color: #3a4a6a; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid #1e2744; }
+    table.sum-table td { padding: 9px 10px; border-bottom: 1px solid #111827; vertical-align: middle; }
+    table.sum-table tr:last-child td { border-bottom: none; }
+    table.sum-table tr:hover td { background: #131a30; }
+    .align-right { text-align: right; }
+    table.sum-table tfoot td { border-top: 1px solid #2a3560; padding-top: 12px; font-weight: 700; color: #fff; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>💡 Potential Investments</h1>
+  <div class="nav">
+    <a href="portfolio_dashboard.html">🏠 Dashboard</a>
+    <a href="premium_log.html">📋 Premium Log</a>
+    <a href="cc_calculator.html">🧮 CC Calc</a>
+    <a href="portfolio_roadmap.html">🗺️ Roadmap</a>
+    <a href="options_tracker.html">⚙️ Options</a>
+    <a href="monthly_review.html">📊 Monthly Review</a>
+  </div>
+</div>
+
+<!-- API -->
+<div class="api-bar">
+  <label>🔑 Finnhub Key</label>
+  <input type="text" id="api-key-input" placeholder="Paste Finnhub API key…">
+  <button class="btn-sm" onclick="saveAndFetch()">Load Prices</button>
+  <button class="btn-ghost" onclick="fetchAllPrices()">↻ Refresh</button>
+  <span id="api-status">Prices + earnings data load via Finnhub</span>
+</div>
+
+<!-- Amount -->
+<div class="amount-section">
+  <div class="section-title">How much are you deploying?</div>
+  <div class="amount-row">
+    <div class="amount-input-wrap">
+      <span>$</span>
+      <input type="number" id="total-amount" value="1500" min="1" oninput="recalcAll()">
+    </div>
+    <div class="quick-amounts">
+      <button class="qa-btn" onclick="setAmount(500)">$500</button>
+      <button class="qa-btn" onclick="setAmount(1000)">$1,000</button>
+      <button class="qa-btn" onclick="setAmount(1500)">$1,500</button>
+      <button class="qa-btn" onclick="setAmount(2000)">$2,000</button>
+      <button class="qa-btn" onclick="setAmount(3500)">$3,500</button>
+      <button class="qa-btn" onclick="setAmount(5000)">$5,000</button>
+    </div>
+    <span id="unallocated-badge" class="unallocated-badge badge-warn">$1,500 unallocated</span>
+  </div>
+
+  <!-- Recommend button -->
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <button class="rec-btn" id="rec-btn" onclick="generateRecommendation()">
+      ✦ Get Allocation Recommendation
+    </button>
+    <span style="font-size:0.75rem;color:#3a4a6a;">Works with or without selections — recommends from all available candidates based on your strategy</span>
+  </div>
+</div>
+
+<!-- Recommendation panel -->
+<div class="rec-panel" id="rec-panel">
+  <h3>✦ Recommended Allocation</h3>
+  <div id="rec-rows"></div>
+  <button class="apply-rec-btn" onclick="applyRecommendation()">Apply These Allocations →</button>
+</div>
+
+<!-- Controls -->
+<div class="section-title">Select investments &amp; set allocations</div>
+<div class="controls-row">
+  <button class="btn-ghost" onclick="equalSplit()">⚖ Equal Split</button>
+  <button class="btn-ghost" onclick="clearAll()">✕ Clear All</button>
+  <span id="selected-count">0 selected</span>
+</div>
+
+<!-- Cards -->
+<div class="candidates-grid" id="candidates-grid"></div>
+
+<!-- Add custom -->
+<div class="add-custom">
+  <span style="color:#22d3ee;font-size:1.1rem;">＋</span>
+  <input type="text" id="custom-ticker-input" placeholder="TICKER" maxlength="8" onkeydown="if(event.key==='Enter')addCustom()">
+  <button class="btn-ghost" onclick="addCustom()">Add Ticker</button>
+  <span style="font-size:0.78rem;color:#3a4a6a;">Add any stock not listed above</span>
+  <span id="custom-status" style="font-size:0.75rem;color:#5a6a8a;"></span>
+</div>
+
+<!-- Summary -->
+<div class="summary-section" id="summary-section" style="display:none;">
+  <div class="section-title">Allocation Summary</div>
+  <table class="sum-table">
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Type</th>
+        <th class="align-right">$ Allocated</th>
+        <th class="align-right">Live Price</th>
+        <th class="align-right">Shares Acquired</th>
+        <th class="align-right">New Avg Cost</th>
+        <th class="align-right">New Position Value</th>
+      </tr>
+    </thead>
+    <tbody id="summary-tbody"></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2">Total</td>
+        <td class="align-right" id="summary-total-alloc">—</td>
+        <td colspan="3"></td>
+        <td class="align-right" id="summary-total-val">—</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+<script>
+// ── Portfolio context ─────────────────────────────────────────────────
+const HOLDINGS = {
+  RKLB: { shares: 577.337, avgCost: 15.36 },
+  OKLO: { shares: 200.068, avgCost: 32.77 },
+  TSLA: { shares: 20,      avgCost: 182.87, targetShares: 100, note: 'Need 80 more to unlock covered calls' },
+  WMT:  { shares: 70.118,  avgCost: 79.13 },
+  DKNG: { shares: 300.199, avgCost: 31.94 },
+  SOFI: { shares: 91.504,  avgCost: 27.32 },
+};
+
+const TAG_CONFIG = {
+  existing:   { label: 'Existing',   cls: 'tag-existing' },
+  new:        { label: 'New',        cls: 'tag-new' },
+  avgdown:    { label: 'Avg Down',   cls: 'tag-avgdown' },
+  accumulate: { label: 'Accumulate', cls: 'tag-accumulate' },
+  winner:     { label: 'Winner',     cls: 'tag-winner' },
+  defensive:  { label: 'Defensive',  cls: 'tag-defensive' },
+  quantum:    { label: 'Quantum',    cls: 'tag-quantum' },
+  saas:       { label: 'SaaS',       cls: 'tag-saas' },
+};
+
+let candidates = [
+  { id:'DKNG', ticker:'DKNG', name:'DraftKings',     existing:true,  tags:['existing','avgdown'],    note:'Underwater avg down. Current avg: <strong>$31.94</strong> · <span class="underwater">Unrealized loss</span>. High recovery potential but most exposed to risk-off.' },
+  { id:'TSLA', ticker:'TSLA', name:'Tesla',           existing:true,  tags:['existing','accumulate'], note:'Accumulating 80 more shares to unlock covered calls. Current avg: <strong>$182.87</strong>. Each share brings you closer to the June dual-engine unlock.' },
+  { id:'SOFI', ticker:'SOFI', name:'SoFi Technologies',existing:true, tags:['existing','avgdown'],    note:'Underwater position. Current avg: <strong>$27.32</strong> · <span class="underwater">Unrealized loss</span>. Fintech recovery play.' },
+  { id:'IONQ', ticker:'IONQ', name:'IonQ Inc.',       existing:false, tags:['new','quantum'],         note:'Quantum computing — high growth, high volatility. New position candidate from your watchlist.' },
+  { id:'NOW',  ticker:'NOW',  name:'ServiceNow',      existing:false, tags:['new','saas'],            note:'Enterprise SaaS compounder. High quality business. Trades at a premium. From your $2,000 reserve watchlist.' },
+  { id:'RKLB', ticker:'RKLB', name:'Rocket Lab',      existing:true,  tags:['existing','winner'],     note:'Primary CC engine. Adding shares increases covered call income potential. Defense/space tailwind.' },
+  { id:'OKLO', ticker:'OKLO', name:'Oklo Inc.',       existing:true,  tags:['existing','winner'],     note:'Strong winner — nuclear tailwind. Hold recommended, but adding on dips builds the position.' },
+  { id:'WMT',  ticker:'WMT',  name:'Walmart',         existing:true,  tags:['existing','defensive'],  note:'Defensive safe haven. Benefits from risk-off environments. Adds portfolio stability.' },
+];
+
+let livePrices  = {};
+let earningsCache = {};
+let selections  = {};
+let pendingRec  = {};  // stores last generated recommendation
+let apiKey      = localStorage.getItem('finnhub_api_key') || '';
+
+// ── Init ──────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  if (apiKey) {
+    document.getElementById('api-key-input').value = apiKey;
+    fetchAllPrices();
+  }
+  renderCards();
+  recalcAll();
+});
+
+// ── API helpers ───────────────────────────────────────────────────────
+function apiUrl(path) {
+  return path.replace('/api/', 'https://finnhub.io/api/v1/');
+}
+
+function saveAndFetch() {
+  apiKey = document.getElementById('api-key-input').value.trim();
+  if (!apiKey) return;
+  localStorage.setItem('finnhub_api_key', apiKey);
+  fetchAllPrices();
+}
+
+async function fetchAllPrices() {
+  if (!apiKey) return;
+  document.getElementById('api-status').textContent = '⏳ Loading prices…';
+  const tickers = [...new Set(candidates.map(c => c.ticker))];
+  await Promise.allSettled(tickers.map(sym => fetchPrice(sym)));
+  document.getElementById('api-status').textContent = '✓ Prices loaded — ' + new Date().toLocaleTimeString();
+  renderCards();
+  recalcAll();
+}
+
+async function fetchPrice(sym) {
+  try {
+    const url = `https://finnhub.io/api/v1/quote?symbol=${sym}&token=${apiKey}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if (d && d.c > 0) livePrices[sym] = { c: d.c, pc: d.pc, dp: ((d.c - d.pc) / d.pc) * 100 };
+  } catch(e) {}
+}
+
+// ── Earnings fetch ────────────────────────────────────────────────────
+async function fetchEarnings(ticker) {
+  if (earningsCache[ticker]) return earningsCache[ticker];
+  if (!apiKey) return null;
+  try {
+    const url = `https://finnhub.io/api/v1/stock/earnings?symbol=${ticker}&token=${apiKey}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    earningsCache[ticker] = Array.isArray(d) ? d.slice(0, 4) : [];
+    return earningsCache[ticker];
+  } catch(e) {
+    earningsCache[ticker] = [];
+    return [];
+  }
+}
+
+function renderEarnings(ticker, data) {
+  const el = document.getElementById('earnings-data-' + ticker);
+  if (!el) return;
+  if (!data || data.length === 0) {
+    el.innerHTML = '<span class="earnings-loading">No earnings data available</span>';
+    return;
+  }
+
+  let rows = '';
+  data.forEach(q => {
+    const period  = q.period ? q.period.substring(0,7) : '—';
+    const actual  = q.actual  != null ? q.actual.toFixed(2)  : '—';
+    const est     = q.estimate != null ? q.estimate.toFixed(2) : '—';
+    const surp    = q.surprisePercent != null ? q.surprisePercent.toFixed(1) : null;
+    let beatClass = '', badge = '';
+    if (surp != null) {
+      const n = parseFloat(surp);
+      if (n > 2)       { beatClass = 'beat'; badge = `<span class="inline-badge beat-badge">BEAT</span>`; }
+      else if (n < -2) { beatClass = 'miss'; badge = `<span class="inline-badge miss-badge">MISS</span>`; }
+      else             { badge = `<span class="inline-badge in-line-badge">IN LINE</span>`; }
+    }
+    rows += `<tr>
+      <td>${period}</td>
+      <td class="${beatClass}">${actual}${badge}</td>
+      <td>${est}</td>
+      <td class="${beatClass}">${surp != null ? (surp > 0 ? '+' : '') + surp + '%' : '—'}</td>
+    </tr>`;
+  });
+
+  el.innerHTML = `
+    <table class="earnings-table">
+      <thead><tr><th>Quarter</th><th>EPS Actual</th><th>EPS Est.</th><th>Surprise</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ── Render cards ──────────────────────────────────────────────────────
+function renderCards() {
+  const grid  = document.getElementById('candidates-grid');
+  const total = parseFloat(document.getElementById('total-amount').value) || 0;
+  grid.innerHTML = '';
+
+  candidates.forEach(c => {
+    const sel = selections[c.id] || { selected: false, alloc: 0 };
+    const p   = livePrices[c.ticker];
+    const h   = HOLDINGS[c.ticker];
+    const isSel = sel.selected;
+    const borderCls = isSel ? (h ? 'selected-avg' : 'selected') : '';
+
+    const priceHtml = p
+      ? `<div class="cp">$${p.c.toFixed(2)}</div>
+         <div class="chg ${p.dp >= 0 ? 'pos':'neg'}">${p.dp >= 0 ? '+':''}${p.dp.toFixed(2)}% today</div>`
+      : `<div class="cp" style="color:#3a4a6a;">—</div>
+         <div style="font-size:0.7rem;color:#2a3a6a;">no price</div>`;
+
+    const tagsHtml = c.tags.map(t => `<span class="tag ${TAG_CONFIG[t].cls}">${TAG_CONFIG[t].label}</span>`).join('');
+    const allocPct = total > 0 && sel.alloc > 0 ? ((sel.alloc / total) * 100).toFixed(0) + '%' : '';
+
+    // Outcome calc
+    let outcomeHtml = '';
+    if (isSel && sel.alloc > 0) {
+      const price = p ? p.c : (h ? h.avgCost : 0);
+      if (price > 0) {
+        const newShares = sel.alloc / price;
+        if (h) {
+          const totalShares = h.shares + newShares;
+          const totalCost   = (h.shares * h.avgCost) + sel.alloc;
+          const newAvg      = totalCost / totalShares;
+          const imp         = h.avgCost - newAvg;
+          const impStr = imp > 0.005
+            ? `<span class="improvement">↓$${imp.toFixed(2)} lower avg</span>` : '';
+          outcomeHtml = `Buying <strong>${newShares.toFixed(3)} shares</strong> @ $${price.toFixed(2)}<br>
+            New avg: <strong>$${newAvg.toFixed(2)}</strong> ${impStr} · Total shares: <strong>${totalShares.toFixed(3)}</strong>`;
+        } else {
+          outcomeHtml = `Buying <strong>${newShares.toFixed(3)} shares</strong> @ $${price.toFixed(2)}<br>
+            New position: <strong>${newShares.toFixed(3)} ${c.ticker}</strong>`;
+        }
+      }
+    }
+
+    grid.innerHTML += `
+      <div class="candidate-card ${borderCls}" id="card-${c.id}" onclick="toggleCard('${c.id}')">
+        <button class="card-remove" onclick="event.stopPropagation();removeCandidate('${c.id}')" title="Remove">✕</button>
+        <div class="card-top">
+          <div><div class="card-ticker">${c.ticker}</div><div class="card-name">${c.name}</div></div>
+          <div class="card-price">${priceHtml}</div>
+        </div>
+        <div class="card-tags">${tagsHtml}</div>
+        <div class="card-stat">${c.note}</div>
+
+        ${isSel ? `
+        <div class="alloc-row" onclick="event.stopPropagation()">
+          <label>Allocate $</label>
+          <input class="alloc-input" type="number" id="alloc-${c.id}" value="${sel.alloc}"
+            oninput="updateAlloc('${c.id}', this.value)" min="0">
+          <span class="alloc-result" id="alloc-pct-${c.id}">${allocPct}</span>
+        </div>
+        <div class="outcome-box ${outcomeHtml ? 'show':''}" id="outcome-${c.id}">${outcomeHtml}</div>
+        <div class="earnings-section show" id="earnings-${c.id}">
+          <div class="earnings-header">
+            <span>Recent Earnings</span>
+            <span id="earnings-status-${c.id}" class="earnings-loading">Loading…</span>
+          </div>
+          <div id="earnings-data-${c.id}"><span class="earnings-loading">Fetching from Finnhub…</span></div>
+        </div>
+        ` : ''}
+      </div>`;
+
+    // Kick off earnings fetch for selected cards
+    if (isSel && apiKey) {
+      fetchEarnings(c.ticker).then(data => {
+        document.getElementById('earnings-status-' + c.id) &&
+          (document.getElementById('earnings-status-' + c.id).textContent = data && data.length ? 'Last 4 quarters' : '');
+        renderEarnings(c.ticker, data);
+      });
+    }
+  });
+}
+
+// ── Toggle / alloc ────────────────────────────────────────────────────
+function toggleCard(id) {
+  if (!selections[id]) selections[id] = { selected: false, alloc: 0 };
+  selections[id].selected = !selections[id].selected;
+  if (!selections[id].selected) {
+    selections[id].alloc = 0;
+  } else {
+    const total    = parseFloat(document.getElementById('total-amount').value) || 0;
+    const nowCount = Object.values(selections).filter(s => s.selected).length;
+    selections[id].alloc = Math.round(total / nowCount);
+  }
+  renderCards();
+  recalcAll();
+}
+
+function updateAlloc(id, val) {
+  if (!selections[id]) selections[id] = { selected: true, alloc: 0 };
+  selections[id].alloc = parseFloat(val) || 0;
+  recalcAll();
+  updateOutcomeBox(id);
+  updateAllocPct(id);
+}
+
+function updateOutcomeBox(id) {
+  const c   = candidates.find(x => x.id === id);
+  const sel = selections[id];
+  const p   = livePrices[c?.ticker];
+  const h   = HOLDINGS[c?.ticker];
+  const el  = document.getElementById('outcome-' + id);
+  if (!el || !c || !sel || sel.alloc <= 0) { el && (el.innerHTML = '') && el.classList.remove('show'); return; }
+  const price = p ? p.c : (h ? h.avgCost : 0);
+  if (!price) return;
+  const newShares = sel.alloc / price;
+  let html = '';
+  if (h) {
+    const totalShares = h.shares + newShares;
+    const newAvg = ((h.shares * h.avgCost) + sel.alloc) / totalShares;
+    const imp = h.avgCost - newAvg;
+    html = `Buying <strong>${newShares.toFixed(3)} shares</strong> @ $${price.toFixed(2)}<br>
+      New avg: <strong>$${newAvg.toFixed(2)}</strong>${imp > 0.005 ? ` <span class="improvement">↓$${imp.toFixed(2)}</span>` : ''} · Total: <strong>${totalShares.toFixed(3)}</strong>`;
+  } else {
+    html = `Buying <strong>${newShares.toFixed(3)} shares</strong> @ $${price.toFixed(2)}<br>New position: <strong>${newShares.toFixed(3)} ${c.ticker}</strong>`;
+  }
+  el.innerHTML = html;
+  el.classList.add('show');
+}
+
+function updateAllocPct(id) {
+  const el  = document.getElementById('alloc-pct-' + id);
+  const sel = selections[id];
+  const tot = parseFloat(document.getElementById('total-amount').value) || 0;
+  if (el) el.textContent = (tot > 0 && sel?.alloc > 0) ? ((sel.alloc / tot) * 100).toFixed(0) + '%' : '';
+}
+
+// ── Recalc badge + summary ────────────────────────────────────────────
+function recalcAll() {
+  const total     = parseFloat(document.getElementById('total-amount').value) || 0;
+  const allocated = Object.values(selections).filter(s => s.selected).reduce((a, s) => a + (s.alloc || 0), 0);
+  const remaining = total - allocated;
+  const badge     = document.getElementById('unallocated-badge');
+
+  if (remaining < -0.5)  { badge.textContent = `⚠ $${Math.abs(remaining).toFixed(0)} over budget`; badge.className = 'unallocated-badge badge-over'; }
+  else if (remaining < 0.5) { badge.textContent = '✓ Fully allocated'; badge.className = 'unallocated-badge badge-ok'; }
+  else { badge.textContent = `$${remaining.toLocaleString()} unallocated`; badge.className = 'unallocated-badge badge-warn'; }
+
+  const selCount = Object.values(selections).filter(s => s.selected).length;
+  document.getElementById('selected-count').textContent = selCount + ' selected';
+  Object.keys(selections).forEach(id => updateAllocPct(id));
+  renderSummary();
+}
+
+// ── Smart recommendation ──────────────────────────────────────────────
+function generateRecommendation() {
+  const total  = parseFloat(document.getElementById('total-amount').value) || 0;
+  // Use all visible candidates — no pre-selection required
+  const selIds = candidates.map(c => c.id);
+
+  const recs  = [];
+  let   budget = total;
+
+  // Score each selection
+  const scored = selIds.map(id => {
+    const c = candidates.find(x => x.id === id);
+    const h = HOLDINGS[c.ticker];
+    const p = livePrices[c.ticker];
+    let score = 0, reason = '', priority = 'normal';
+
+    if (c.ticker === 'TSLA' && h) {
+      // TSLA: calculate exact cost to reach 100 shares
+      const need        = Math.max(0, (h.targetShares || 100) - h.shares);
+      const exactCost   = p ? Math.min(need * p.c, total * 0.6) : total * 0.4;
+      score = 90; priority = 'high';
+      reason = `<strong>Unlocks June covered calls.</strong> Need ~${need.toFixed(0)} more shares${p ? ` ≈ $${(need * p.c).toFixed(0)} at live price` : ''}. Dual-engine = ~$4K/mo extra from June onward.`;
+      return { id, c, score, priority, suggestedAmt: Math.round(Math.min(exactCost, budget * 0.55)), reason };
+    }
+
+    if (c.ticker === 'DKNG' && h) {
+      const pctDown = p ? ((h.avgCost - p.c) / h.avgCost * 100) : 20;
+      score = 60 + Math.min(pctDown, 30);
+      priority = pctDown > 15 ? 'high' : 'normal';
+      const sugPct = pctDown > 20 ? 0.40 : 0.25;
+      reason = `<strong>Avg down opportunity.</strong> ${pctDown.toFixed(1)}% below your cost basis. ${pctDown > 20 ? 'Significant discount — aggressive avg down makes sense.' : 'Moderate discount — partial avg down reduces cost basis.'}`;
+      return { id, c, score, priority, suggestedAmt: Math.round(total * sugPct), reason };
+    }
+
+    if (c.ticker === 'SOFI' && h) {
+      const pctDown = p ? ((h.avgCost - p.c) / h.avgCost * 100) : 15;
+      score = 45 + Math.min(pctDown, 20);
+      reason = `<strong>Avg down — lower priority than DKNG.</strong> ${pctDown.toFixed(1)}% below cost. Smaller allocation appropriate until recovery trend confirms.`;
+      return { id, c, score, priority: 'low', suggestedAmt: Math.round(total * 0.15), reason };
+    }
+
+    if (c.ticker === 'RKLB' && h) {
+      score = 55;
+      reason = `<strong>CC engine builder.</strong> More RKLB shares = more contracts = more premium income. Each 100 shares = 1 more contract ≈ $480/cycle.`;
+      return { id, c, score, priority: 'normal', suggestedAmt: Math.round(total * 0.20), reason };
+    }
+
+    if (c.ticker === 'IONQ') {
+      score = 40;
+      reason = `<strong>Speculative growth.</strong> High-volatility quantum play — cap at 15–20% to limit downside. Good asymmetric upside potential.`;
+      return { id, c, score, priority: 'low', suggestedAmt: Math.round(total * 0.15), reason };
+    }
+
+    if (c.ticker === 'NOW') {
+      score = 50;
+      reason = `<strong>Quality compounder.</strong> Expensive but high-quality SaaS. Even fractional shares have strong long-term track record.`;
+      return { id, c, score, priority: 'normal', suggestedAmt: Math.round(total * 0.20), reason };
+    }
+
+    if (c.ticker === 'OKLO' && h) {
+      score = 55;
+      reason = `<strong>Winner — add on strength.</strong> Nuclear tailwind continues. Adding builds position in your best-performing holding.`;
+      return { id, c, score, priority: 'normal', suggestedAmt: Math.round(total * 0.20), reason };
+    }
+
+    if (c.ticker === 'WMT' && h) {
+      score = 35;
+      reason = `<strong>Defensive add.</strong> Safe haven in volatile environments. Lower growth potential but protects portfolio in drawdowns.`;
+      return { id, c, score, priority: 'low', suggestedAmt: Math.round(total * 0.10), reason };
+    }
+
+    // Custom / unknown
+    score = 30;
+    reason = `<strong>Custom position.</strong> No specific strategy context — equal allocation applied.`;
+    return { id, c, score, priority: 'normal', suggestedAmt: Math.round(total / selIds.length), reason };
+  });
+
+  // Sort by score descending, keep only meaningful picks
+  scored.sort((a, b) => b.score - a.score);
+
+  // If running without pre-selection, trim to top picks only (score > 35, max 5)
+  const preSelected = Object.values(selections).some(s => s.selected);
+  const finalScored = preSelected
+    ? scored  // respect manual selection — show all
+    : scored.filter(r => r.score > 35).slice(0, 5);
+
+  // Normalize amounts to sum to total
+  const rawTotal = finalScored.reduce((s, r) => s + r.suggestedAmt, 0);
+  let remainder = total;
+  finalScored.forEach((r, i) => {
+    if (i === finalScored.length - 1) {
+      r.finalAmt = Math.max(0, remainder);
+    } else {
+      r.finalAmt = Math.round((r.suggestedAmt / rawTotal) * total);
+      remainder -= r.finalAmt;
+    }
+  });
+
+  const scored_to_show = finalScored; // alias for render below
+
+  // Store for apply
+  pendingRec = {};
+  finalScored.forEach(r => { pendingRec[r.id] = r.finalAmt; });
+
+  // Render panel
+  let html = '';
+  finalScored.forEach(r => {
+    const pct = total > 0 ? ((r.finalAmt / total) * 100).toFixed(0) : 0;
+    const prioColor = r.priority === 'high' ? '#22c55e' : r.priority === 'low' ? '#8a9abc' : '#22d3ee';
+    html += `
+      <div class="rec-row">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <span class="rec-ticker">${r.c.ticker}</span>
+          <span style="font-size:0.65rem;color:${prioColor};font-weight:700;">${r.priority.toUpperCase()}</span>
+        </div>
+        <span class="rec-pct">${pct}%</span>
+        <span class="rec-amount">$${r.finalAmt.toLocaleString()}</span>
+        <span class="rec-reason">${r.reason}</span>
+      </div>`;
+  });
+
+  document.getElementById('rec-rows').innerHTML = html;
+  document.getElementById('rec-panel').classList.add('show');
+}
+
+function applyRecommendation() {
+  // Deselect everything first, then select only recommended picks
+  Object.keys(selections).forEach(id => { selections[id].selected = false; selections[id].alloc = 0; });
+  Object.entries(pendingRec).forEach(([id, amt]) => {
+    selections[id] = { selected: true, alloc: amt };
+  });
+  renderCards();
+  recalcAll();
+}
+
+// ── Summary table ─────────────────────────────────────────────────────
+function renderSummary() {
+  const selected = Object.entries(selections).filter(([,s]) => s.selected && s.alloc > 0);
+  const section  = document.getElementById('summary-section');
+  if (selected.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  const tbody = document.getElementById('summary-tbody');
+  tbody.innerHTML = '';
+  let totalAlloc = 0, totalNewVal = 0;
+
+  selected.forEach(([id, sel]) => {
+    const c     = candidates.find(x => x.id === id);
+    if (!c) return;
+    const p     = livePrices[c.ticker];
+    const h     = HOLDINGS[c.ticker];
+    const price = p ? p.c : (h ? h.avgCost : null);
+    const newSh = price ? sel.alloc / price : null;
+    const newAvg = h && price ? ((h.shares * h.avgCost) + sel.alloc) / (h.shares + newSh) : price;
+    const posVal = price && newSh ? (h ? (h.shares + newSh) * price : newSh * price) : null;
+    totalAlloc += sel.alloc;
+    if (posVal) totalNewVal += posVal;
+
+    tbody.innerHTML += `
+      <tr>
+        <td><strong style="color:#fff;">${c.ticker}</strong> <span style="font-size:0.72rem;color:#5a6a8a;">${c.name}</span></td>
+        <td><span style="font-size:0.72rem;color:${h ? '#6ee7b7':'#c084fc'};">${h ? 'Existing':'New'}</span></td>
+        <td class="align-right" style="color:#22c55e;font-weight:700;">$${sel.alloc.toLocaleString()}</td>
+        <td class="align-right">${price ? '$' + price.toFixed(2) : '<span style="color:#3a4a6a;">—</span>'}</td>
+        <td class="align-right">${newSh ? newSh.toFixed(3) : '—'}</td>
+        <td class="align-right">${newAvg ? '$' + newAvg.toFixed(2) : '—'}</td>
+        <td class="align-right">${posVal ? '$' + posVal.toFixed(2) : '—'}</td>
+      </tr>`;
+  });
+
+  document.getElementById('summary-total-alloc').textContent = '$' + totalAlloc.toLocaleString();
+  document.getElementById('summary-total-val').textContent   = totalNewVal > 0 ? '$' + totalNewVal.toFixed(2) : '—';
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────
+function setAmount(n) {
+  document.getElementById('total-amount').value = n;
+  equalSplit();
+}
+
+function equalSplit() {
+  const total  = parseFloat(document.getElementById('total-amount').value) || 0;
+  const selIds = Object.entries(selections).filter(([,s]) => s.selected).map(([id]) => id);
+  if (!selIds.length) return;
+  const each   = Math.round(total / selIds.length);
+  selIds.forEach(id => { selections[id].alloc = each; });
+  renderCards();
+  recalcAll();
+}
+
+function clearAll() {
+  selections = {};
+  pendingRec = {};
+  document.getElementById('rec-panel').classList.remove('show');
+  renderCards();
+  recalcAll();
+}
+
+function removeCandidate(id) {
+  candidates = candidates.filter(c => c.id !== id);
+  delete selections[id];
+  delete pendingRec[id];
+  renderCards();
+  recalcAll();
+}
+
+async function addCustom() {
+  const input  = document.getElementById('custom-ticker-input');
+  const ticker = input.value.trim().toUpperCase();
+  const status = document.getElementById('custom-status');
+  if (!ticker) return;
+  if (candidates.find(c => c.ticker === ticker)) { status.textContent = ticker + ' already listed'; return; }
+  status.textContent = 'Adding…';
+  if (apiKey) await fetchPrice(ticker);
+  const p = livePrices[ticker];
+  candidates.push({
+    id: ticker, ticker, name: ticker,
+    existing: !!HOLDINGS[ticker],
+    tags: HOLDINGS[ticker] ? ['existing'] : ['new'],
+    note: p ? `Live price: <strong>$${p.c.toFixed(2)}</strong> · Custom ticker` : 'Custom ticker — load prices for details.'
+  });
+  input.value = '';
+  status.textContent = p ? `✓ ${ticker} added @ $${p.c.toFixed(2)}` : `✓ ${ticker} added`;
+  renderCards();
+}
+</script>
+</body>
+</html>

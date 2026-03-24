@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CC Calculator — $120K Mission</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #080c18; color: #c9d4e8; font-family: 'Segoe UI', system-ui, sans-serif; padding: 24px 20px 48px; }
+
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+    .header h1 { font-size: 1.4rem; color: #fff; }
+    .header h1 span { color: #22d3ee; }
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .nav a { color: #22d3ee; font-size: 0.78rem; text-decoration: none; border: 1px solid #1e2744; padding: 5px 12px; border-radius: 20px; }
+    .nav a:hover { background: #0f1428; }
+
+    .section-title { font-size: 0.75rem; color: #5a6a8a; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: #1e2744; }
+
+    /* Preset buttons */
+    .presets { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .preset-btn { background: #0f1428; border: 1px solid #2a3560; color: #8a9abc; padding: 7px 14px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: all 0.15s; }
+    .preset-btn:hover, .preset-btn.active { background: #1e2744; border-color: #22d3ee; color: #22d3ee; }
+
+    /* Main layout */
+    .main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
+    @media (max-width: 780px) { .main-grid { grid-template-columns: 1fr; } }
+
+    /* Input panel */
+    .input-panel { background: #0f1428; border: 1px solid #1e2744; border-radius: 12px; padding: 22px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.72rem; color: #5a6a8a; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+    .form-group input { width: 100%; background: #080c18; border: 1px solid #2a3560; color: #e0e6f0; padding: 9px 12px; border-radius: 8px; font-size: 0.9rem; }
+    .form-group input:focus { outline: none; border-color: #22d3ee; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .input-hint { font-size: 0.7rem; color: #3a4a6a; margin-top: 4px; }
+
+    .calc-btn { width: 100%; background: #22d3ee; color: #000; border: none; padding: 11px; border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer; margin-top: 4px; }
+    .calc-btn:hover { background: #06b6d4; }
+
+    /* Results panel */
+    .results-panel { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Result cards */
+    .result-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .rc { background: #0f1428; border: 1px solid #1e2744; border-radius: 10px; padding: 14px 16px; }
+    .rc .rl { font-size: 0.68rem; color: #5a6a8a; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px; }
+    .rc .rv { font-size: 1.35rem; font-weight: 700; }
+    .rc .rs { font-size: 0.72rem; color: #5a6a8a; margin-top: 3px; }
+    .green { color: #22c55e; } .cyan { color: #22d3ee; } .amber { color: #f59e0b; } .red { color: #f87171; } .purple { color: #c084fc; }
+
+    /* P&L chart */
+    .chart-panel { background: #0f1428; border: 1px solid #1e2744; border-radius: 12px; padding: 20px; }
+    canvas { width: 100%; border-radius: 6px; }
+
+    /* Scenario table */
+    .scenario-panel { background: #0f1428; border: 1px solid #1e2744; border-radius: 12px; padding: 20px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    th { text-align: left; padding: 7px 10px; color: #3a4a6a; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid #1e2744; }
+    td { padding: 8px 10px; border-bottom: 1px solid #111827; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #131a30; }
+    .align-right { text-align: right; }
+    .row-highlight { background: #0e2a1a !important; }
+
+    /* Comparison strip */
+    .comparison { background: #0f1428; border: 1px solid #1e2744; border-radius: 12px; padding: 20px; }
+    .comp-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #111827; font-size: 0.82rem; }
+    .comp-row:last-child { border-bottom: none; }
+    .comp-label { color: #8a9abc; }
+    .comp-value { color: #fff; font-weight: 600; }
+
+    /* Break-even zone */
+    .be-badge { display: inline-block; background: #1e3a1e; color: #86efac; font-size: 0.72rem; padding: 3px 8px; border-radius: 4px; margin-left: 6px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🧮 Covered Call Calculator — <span>$120K Mission</span></h1>
+  <div class="nav">
+    <a href="portfolio_dashboard.html">🏠 Dashboard</a>
+    <a href="premium_log.html">📋 Premium Log</a>
+    <a href="deployment_planner.html">💡 Investments</a>
+    <a href="portfolio_roadmap.html">🗺️ Roadmap</a>
+    <a href="options_tracker.html">⚙️ Options</a>
+    <a href="monthly_review.html">📊 Monthly Review</a>
+    <a href="portfolio_roadmap.html">Roadmap</a>
+  </div>
+</div>
+
+<!-- Live price status bar -->
+<div id="price-bar" style="background:#1a1f3a;border:1px solid #2a3560;border-radius:8px;padding:9px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;font-size:0.78rem;flex-wrap:wrap;">
+  <span style="color:#5a6a8a;">Live price:</span>
+  <span id="live-price-display" style="color:#22d3ee;font-weight:700;">—</span>
+  <span id="live-price-change" style="font-size:0.72rem;"></span>
+  <span id="live-price-status" style="color:#3a4a6a;margin-left:auto;">Reads your saved Finnhub key automatically</span>
+</div>
+
+<!-- Preset buttons -->
+<div class="presets">
+  <span style="font-size:0.78rem;color:#5a6a8a;align-self:center;">Quick load:</span>
+  <button class="preset-btn active" onclick="loadPreset('rklb_c1')">RKLB Cycle 1 (active)</button>
+  <button class="preset-btn" onclick="loadPreset('rklb_c2')">RKLB Cycle 2 (model)</button>
+  <button class="preset-btn" onclick="loadPreset('tsla')">TSLA (Jun unlock model)</button>
+  <button class="preset-btn" onclick="loadPreset('custom')">Custom</button>
+</div>
+
+<div class="main-grid">
+
+  <!-- Inputs -->
+  <div class="input-panel">
+    <div class="section-title">Position Inputs</div>
+    <div class="form-group">
+      <label>Ticker</label>
+      <input type="text" id="f-ticker" value="RKLB" onblur="fetchAndApplyPrice()">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Stock Price ($)</label>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input type="number" id="f-stock-price" step="0.01" value="15.36" style="flex:1;">
+          <button onclick="fetchAndApplyPrice()" title="Fetch live price" style="background:#1e2744;border:1px solid #2a3560;color:#22d3ee;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:0.75rem;white-space:nowrap;">↻ Live</button>
+        </div>
+        <div class="input-hint">Current market price — auto-filled on preset load</div>
+      </div>
+      <div class="form-group">
+        <label>Avg Cost ($)</label>
+        <input type="number" id="f-avg-cost" step="0.01" value="15.36">
+        <div class="input-hint">Your cost basis</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Strike Price ($)</label>
+        <input type="number" id="f-strike" step="0.01" value="75.00">
+      </div>
+      <div class="form-group">
+        <label>Contracts</label>
+        <input type="number" id="f-contracts" value="5" min="1">
+        <div class="input-hint">1 contract = 100 shares</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Premium / Share ($)</label>
+        <input type="number" id="f-premium" step="0.01" value="4.82">
+      </div>
+      <div class="form-group">
+        <label>Days to Expiry (DTE)</label>
+        <input type="number" id="f-dte" value="33">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Shares Owned</label>
+      <input type="number" id="f-shares" step="0.001" value="577.337">
+    </div>
+    <button class="calc-btn" onclick="calculate()">Calculate →</button>
+  </div>
+
+  <!-- Results -->
+  <div class="results-panel">
+
+    <!-- Key metrics -->
+    <div class="result-cards">
+      <div class="rc"><div class="rl">Total Premium</div><div class="rv green" id="r-total-premium">$2,410</div><div class="rs">$4.82 × 500 shares</div></div>
+      <div class="rc"><div class="rl">Annualized Return</div><div class="rv cyan" id="r-ann-return">53.3%</div><div class="rs">On premium vs stock price</div></div>
+      <div class="rc"><div class="rl">Break-Even (downside)</div><div class="rv amber" id="r-breakeven">$10.54</div><div class="rs">Stock price – premium</div></div>
+      <div class="rc"><div class="rl">Max Profit</div><div class="rv green" id="r-max-profit">$32,410</div><div class="rs">If called away at strike</div></div>
+      <div class="rc"><div class="rl">Premium / Stock %</div><div class="rv cyan" id="r-prem-pct">31.4%</div><div class="rs">Premium as % of stock price</div></div>
+      <div class="rc"><div class="rl">Strike vs Cost</div><div class="rv purple" id="r-strike-vs-cost">+388%</div><div class="rs">Strike premium over avg cost</div></div>
+    </div>
+
+    <!-- P&L Chart -->
+    <div class="chart-panel">
+      <div class="section-title">P&amp;L at Expiration</div>
+      <canvas id="pnl-chart" height="180"></canvas>
+      <div style="display:flex;gap:16px;margin-top:10px;font-size:0.72rem;flex-wrap:wrap;">
+        <span><span style="color:#22c55e;">●</span> Covered Call P&L</span>
+        <span><span style="color:#2a3560;">●</span> Stock-only P&L (no call)</span>
+        <span id="chart-be-label" style="color:#f59e0b;"></span>
+      </div>
+    </div>
+
+    <!-- Scenario table -->
+    <div class="scenario-panel">
+      <div class="section-title">Scenarios at Expiration</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Stock Price</th>
+            <th>Scenario</th>
+            <th class="align-right">Option P&L</th>
+            <th class="align-right">Stock P&L</th>
+            <th class="align-right">Total P&L</th>
+            <th class="align-right">vs Stock-Only</th>
+          </tr>
+        </thead>
+        <tbody id="scenario-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- vs Strategy comparison -->
+    <div class="comparison">
+      <div class="section-title">Strategy Comparison</div>
+      <div class="comp-row"><span class="comp-label">Premium collected this cycle</span><span class="comp-value green" id="cmp-premium">$2,410</span></div>
+      <div class="comp-row"><span class="comp-label">Annual cycles at this rate (9)</span><span class="comp-value cyan" id="cmp-annual">$21,690</span></div>
+      <div class="comp-row"><span class="comp-label">Stock must rise to match (no calls)</span><span class="comp-value amber" id="cmp-rise-needed">+31.4%</span></div>
+      <div class="comp-row"><span class="comp-label">Income generated in 33 days</span><span class="comp-value green" id="cmp-period">$2,410</span></div>
+      <div class="comp-row"><span class="comp-label">Cap on upside (called away if ></span><span class="comp-value" id="cmp-cap">$75.00)</span></div>
+      <div class="comp-row"><span class="comp-label">Called-away scenario gain</span><span class="comp-value green" id="cmp-called">+$32,410</span></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Live price fetch ─────────────────────────────────────────────────
+const apiKey = localStorage.getItem('finnhub_api_key') || '';
+
+async function fetchAndApplyPrice() {
+  const ticker = document.getElementById('f-ticker').value.trim().toUpperCase();
+  if (!ticker) return;
+  if (!apiKey) {
+    document.getElementById('live-price-status').textContent = '⚠ No API key — save it on another tab first';
+    document.getElementById('live-price-status').style.color = '#f59e0b';
+    return;
+  }
+  document.getElementById('live-price-status').textContent = '⏳ Fetching ' + ticker + '…';
+  document.getElementById('live-price-status').style.color = '#22d3ee';
+  try {
+    const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if (d && d.c > 0) {
+      document.getElementById('f-stock-price').value = d.c.toFixed(2);
+      const chg = d.pc > 0 ? (((d.c - d.pc) / d.pc) * 100) : 0;
+      const sign = chg >= 0 ? '+' : '';
+      document.getElementById('live-price-display').textContent = '$' + d.c.toFixed(2);
+      document.getElementById('live-price-change').textContent  = sign + chg.toFixed(2) + '% today';
+      document.getElementById('live-price-change').style.color  = chg >= 0 ? '#22c55e' : '#f87171';
+      document.getElementById('live-price-status').textContent  = '✓ Live price loaded — ' + new Date().toLocaleTimeString();
+      document.getElementById('live-price-status').style.color  = '#22c55e';
+      calculate();
+    } else {
+      document.getElementById('live-price-status').textContent = '⚠ No price returned for ' + ticker;
+      document.getElementById('live-price-status').style.color = '#f59e0b';
+    }
+  } catch(e) {
+    document.getElementById('live-price-status').textContent = '❌ Fetch failed — is server.py running?';
+    document.getElementById('live-price-status').style.color = '#f87171';
+  }
+}
+
+const presets = {
+  rklb_c1: { ticker:'RKLB', stockPrice:15.36, avgCost:15.36, strike:75, contracts:5, premium:4.82, dte:33, shares:577.337 },
+  rklb_c2: { ticker:'RKLB', stockPrice:15.36, avgCost:15.36, strike:75, contracts:5, premium:4.80, dte:35, shares:577.337 },
+  tsla:    { ticker:'TSLA', stockPrice:182.87, avgCost:182.87, strike:220, contracts:1, premium:20.00, dte:35, shares:100 },
+  custom:  { ticker:'', stockPrice:'', avgCost:'', strike:'', contracts:1, premium:'', dte:30, shares:'' },
+};
+
+function loadPreset(key) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const p = presets[key];
+  document.getElementById('f-ticker').value      = p.ticker;
+  document.getElementById('f-stock-price').value = p.stockPrice || '';
+  document.getElementById('f-avg-cost').value    = p.avgCost;
+  document.getElementById('f-strike').value      = p.strike;
+  document.getElementById('f-contracts').value   = p.contracts;
+  document.getElementById('f-premium').value     = p.premium;
+  document.getElementById('f-dte').value         = p.dte;
+  document.getElementById('f-shares').value      = p.shares;
+  // Auto-fetch live price for the loaded ticker
+  if (p.ticker) fetchAndApplyPrice();
+  else if (p.stockPrice) calculate();
+}
+
+function calculate() {
+  const stockPrice = parseFloat(document.getElementById('f-stock-price').value);
+  const avgCost    = parseFloat(document.getElementById('f-avg-cost').value);
+  const strike     = parseFloat(document.getElementById('f-strike').value);
+  const contracts  = parseInt(document.getElementById('f-contracts').value);
+  const premium    = parseFloat(document.getElementById('f-premium').value);
+  const dte        = parseInt(document.getElementById('f-dte').value);
+  const shares     = parseFloat(document.getElementById('f-shares').value);
+
+  if (!stockPrice || !strike || !premium) return;
+
+  const sharesInContracts = contracts * 100;
+  const totalPremium      = premium * sharesInContracts;
+  const breakEven         = stockPrice - premium;
+  const annReturn         = (premium / stockPrice) * (365 / dte) * 100;
+  const premPct           = (premium / stockPrice) * 100;
+  const maxProfit         = (strike - avgCost) * sharesInContracts + totalPremium;
+  const strikeVsCost      = ((strike - avgCost) / avgCost) * 100;
+
+  // Update metrics
+  document.getElementById('r-total-premium').textContent  = '$' + totalPremium.toLocaleString();
+  document.getElementById('r-ann-return').textContent     = annReturn.toFixed(1) + '%';
+  document.getElementById('r-breakeven').textContent      = '$' + breakEven.toFixed(2);
+  document.getElementById('r-max-profit').textContent     = '$' + Math.round(maxProfit).toLocaleString();
+  document.getElementById('r-prem-pct').textContent       = premPct.toFixed(1) + '%';
+  document.getElementById('r-strike-vs-cost').textContent = (strikeVsCost >= 0 ? '+' : '') + strikeVsCost.toFixed(1) + '%';
+  document.getElementById('chart-be-label').textContent   = `● Break-even: $${breakEven.toFixed(2)}`;
+
+  // Comparison strip
+  document.getElementById('cmp-premium').textContent  = '$' + totalPremium.toLocaleString();
+  document.getElementById('cmp-annual').textContent   = '$' + (totalPremium * 9).toLocaleString();
+  document.getElementById('cmp-rise-needed').textContent = '+' + premPct.toFixed(1) + '%';
+  document.getElementById('cmp-period').textContent   = '$' + totalPremium.toLocaleString() + ' in ' + dte + ' days';
+  document.getElementById('cmp-cap').textContent      = '$' + strike.toFixed(2) + ')';
+  document.getElementById('cmp-called').textContent   = '+$' + Math.round(maxProfit).toLocaleString();
+
+  // Scenario table
+  const scenarios = [
+    { label: 'Deep crash (-50%)', price: stockPrice * 0.5 },
+    { label: 'Down -30%',         price: stockPrice * 0.7 },
+    { label: 'Down -20%',         price: stockPrice * 0.8 },
+    { label: 'At break-even',     price: breakEven },
+    { label: 'Flat (no change)',  price: stockPrice },
+    { label: 'Up +10%',           price: stockPrice * 1.1 },
+    { label: 'At strike',         price: strike },
+    { label: 'Called away +20%',  price: stockPrice * 1.2 },
+    { label: 'Big rip +50%',      price: stockPrice * 1.5 },
+  ];
+
+  const tbody = document.getElementById('scenario-tbody');
+  tbody.innerHTML = '';
+  scenarios.forEach(s => {
+    const sp = s.price;
+    const optionPnl = sp >= strike
+      ? (premium - (sp - strike)) * sharesInContracts  // ITM: lose intrinsic above strike
+      : totalPremium;                                   // OTM: keep full premium
+    const optionPnlCapped = Math.max(optionPnl, -totalPremium); // max loss = premium received
+    const stockPnl  = (sp - avgCost) * sharesInContracts;
+    const totalPnl  = stockPnl + optionPnlCapped;
+    const stockOnly = (sp - avgCost) * sharesInContracts; // no premium
+    const vsStock   = totalPnl - stockOnly;
+
+    const isAtStrike = Math.abs(sp - strike) < 0.5;
+    const rowClass   = isAtStrike ? 'class="row-highlight"' : '';
+    const pnlClass   = totalPnl >= 0 ? 'style="color:#22c55e"' : 'style="color:#f87171"';
+    const vsClass    = vsStock >= 0 ? 'style="color:#22c55e"' : 'style="color:#f87171"';
+
+    tbody.innerHTML += `
+      <tr ${rowClass}>
+        <td><strong>$${sp.toFixed(2)}</strong></td>
+        <td style="color:#8a9abc;font-size:0.75rem;">${s.label}</td>
+        <td class="align-right" ${optionPnlCapped >= 0 ? 'style="color:#22c55e"' : 'style="color:#f87171"'}>
+          ${optionPnlCapped >= 0 ? '+' : ''}$${Math.round(optionPnlCapped).toLocaleString()}</td>
+        <td class="align-right" ${stockPnl >= 0 ? 'style="color:#22c55e"' : 'style="color:#f87171"'}>
+          ${stockPnl >= 0 ? '+' : ''}$${Math.round(stockPnl).toLocaleString()}</td>
+        <td class="align-right" ${pnlClass}><strong>${totalPnl >= 0 ? '+' : ''}$${Math.round(totalPnl).toLocaleString()}</strong></td>
+        <td class="align-right" ${vsClass}>${vsStock >= 0 ? '+' : ''}$${Math.round(vsStock).toLocaleString()}</td>
+      </tr>`;
+  });
+
+  drawChart(stockPrice, avgCost, strike, premium, contracts, dte);
+}
+
+function drawChart(stockPrice, avgCost, strike, premium, contracts, dte) {
+  const canvas = document.getElementById('pnl-chart');
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 600;
+  const H = 180;
+  canvas.width  = W;
+  canvas.height = H;
+
+  const sharesC  = contracts * 100;
+  const totPrem  = premium * sharesC;
+  const minPrice = stockPrice * 0.3;
+  const maxPrice = Math.max(strike * 1.3, stockPrice * 1.5);
+  const steps    = 200;
+  const breakEven = stockPrice - premium;
+
+  // Calculate points
+  const ccPnl   = [];
+  const holdPnl = [];
+  for (let i = 0; i <= steps; i++) {
+    const sp = minPrice + (maxPrice - minPrice) * (i / steps);
+    const optPnl = sp >= strike
+      ? (premium - (sp - strike)) * sharesC
+      : totPrem;
+    const stPnl = (sp - avgCost) * sharesC;
+    ccPnl.push(stPnl + Math.max(optPnl, -totPrem));
+    holdPnl.push(stPnl);
+  }
+
+  const allVals = [...ccPnl, ...holdPnl];
+  const minV = Math.min(...allVals);
+  const maxV = Math.max(...allVals);
+  const range = maxV - minV || 1;
+
+  function xPos(i)  { return (i / steps) * W; }
+  function yPos(v)  { return H - 12 - ((v - minV) / range) * (H - 24); }
+  function priceToX(p) { return ((p - minPrice) / (maxPrice - minPrice)) * W; }
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Zero line
+  const y0 = yPos(0);
+  ctx.strokeStyle = '#1e2744';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(0, y0); ctx.lineTo(W, y0); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Strike line
+  const xS = priceToX(strike);
+  ctx.strokeStyle = '#2a3560';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 6]);
+  ctx.beginPath(); ctx.moveTo(xS, 0); ctx.lineTo(xS, H); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#3a4a6a';
+  ctx.font = '10px Segoe UI';
+  ctx.fillText('Strike $' + strike.toFixed(0), xS + 4, 14);
+
+  // Break-even line
+  const xBe = priceToX(breakEven);
+  ctx.strokeStyle = '#78350f';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([2, 4]);
+  ctx.beginPath(); ctx.moveTo(xBe, 0); ctx.lineTo(xBe, H); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Stock-only line (dim)
+  ctx.strokeStyle = '#1e2744';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  holdPnl.forEach((v, i) => {
+    i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v));
+  });
+  ctx.stroke();
+
+  // CC line
+  ctx.strokeStyle = '#22c55e';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ccPnl.forEach((v, i) => {
+    i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v));
+  });
+  ctx.stroke();
+
+  // Current price marker
+  const xCur = priceToX(stockPrice);
+  ctx.fillStyle = '#22d3ee';
+  ctx.beginPath();
+  ctx.arc(xCur, yPos(ccPnl[Math.round((stockPrice - minPrice) / (maxPrice - minPrice) * steps)]), 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#22d3ee';
+  ctx.font = '10px Segoe UI';
+  ctx.fillText('Now', xCur + 6, yPos(ccPnl[Math.round((stockPrice - minPrice) / (maxPrice - minPrice) * steps)]) + 4);
+}
+
+// Init — fetch live price for default RKLB preset on load
+fetchAndApplyPrice();
+window.addEventListener('resize', calculate);
+</script>
+</body>
+</html>
