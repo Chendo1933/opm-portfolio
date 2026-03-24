@@ -345,6 +345,64 @@
       margin-bottom: 24px;
     }
     @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── Mobile Responsive ───────────────────────── */
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+
+      /* Nav */
+      .nav-links { gap: 5px; }
+      .nav-links a { font-size: 0.72rem; padding: 4px 8px; }
+
+      /* Metric cards — 2 per row on mobile */
+      .cards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .card { padding: 12px 14px; }
+      .card .value { font-size: 1.3rem; }
+
+      /* Setup card inputs stack vertically */
+      .setup-input-row { flex-direction: column; }
+      .setup-input     { max-width: 100% !important; width: 100% !important; }
+      .setup-step      { flex-direction: column; }
+
+      /* Holdings table — horizontal scroll */
+      .holdings-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      table { min-width: 600px; }
+
+      /* Goal progress bar — hide mid milestones */
+      .milestone-label { display: none; }
+      .milestone-label:first-child,
+      .milestone-label:last-child { display: block; }
+
+      /* Sentiment grid — 2 per row */
+      .sentiment-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+      /* Digest grid — 2 per row */
+      .digest-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+      /* Two-col panels stack */
+      .two-col { grid-template-columns: 1fr; }
+
+      /* PE table — horizontal scroll */
+      #portfolio-editor { overflow-x: auto; }
+      .pe-table { min-width: 550px; }
+      .pe-add-row { flex-direction: column; }
+      .pe-add-row .pe-field input,
+      .pe-add-row .pe-field select { width: 100%; }
+
+      /* Section title sizing */
+      .section-title { font-size: 0.8rem; }
+
+      /* Geo risk panel text */
+      .geo-note p { font-size: 0.78rem; }
+    }
+
+    @media (max-width: 480px) {
+      /* Single column cards on very small screens */
+      .cards { grid-template-columns: 1fr; }
+      .sentiment-grid { grid-template-columns: 1fr !important; }
+      .digest-grid    { grid-template-columns: 1fr !important; }
+      .nav-links a    { font-size: 0.68rem; padding: 3px 6px; }
+    }
     .panel {
       background: #0f1428;
       border: 1px solid #1e2744;
@@ -615,11 +673,36 @@
     </div>
   </div>
 
-  <!-- Step 2: GitHub -->
+  <!-- Step 2: Goal -->
   <div class="setup-step">
     <div class="step-num" id="step2-num">2</div>
     <div class="step-body">
-      <div class="step-label">Connect GitHub Backup <span style="font-size:0.72rem;font-weight:400;color:#3a4a6a;">(optional but recommended)</span></div>
+      <div class="step-label">Set Your Goal</div>
+      <div class="step-hint">What portfolio value are you targeting, and by when? Enter your current starting value too.</div>
+      <div class="setup-input-row">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.68rem;color:#5a6a8a;text-transform:uppercase;">Goal ($)</label>
+          <input type="number" id="goal-input" class="setup-input" style="max-width:140px;" placeholder="120000" min="1" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.68rem;color:#5a6a8a;text-transform:uppercase;">Starting Value ($)</label>
+          <input type="number" id="start-value-input" class="setup-input" style="max-width:140px;" placeholder="81800" min="0" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.68rem;color:#5a6a8a;text-transform:uppercase;">Target Date</label>
+          <input type="date" id="goal-date-input" class="setup-input" style="max-width:160px;" />
+        </div>
+        <button class="btn-sm" onclick="saveGoalSettings()" style="align-self:flex-end;">Save Goal</button>
+        <span id="goal-status" style="font-size:0.75rem;color:#5a6a8a;align-self:center;"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: GitHub -->
+  <div class="setup-step">
+    <div class="step-num" id="step3-num">3</div>
+    <div class="step-body">
+      <div class="step-label">Connect GitHub Backup <span style="font-size:0.72rem;font-weight:400;color:#3a4a6a;">(optional)</span></div>
       <div class="step-hint">Saves your portfolio history, positions &amp; premium cycles to GitHub so they're never lost. <a href="https://github.com/settings/tokens" target="_blank">Get a token at github.com/settings/tokens</a> → Tokens (classic) → Generate → check <strong>repo</strong> scope.</div>
       <div class="setup-input-row">
         <input type="password" id="github-pat-input" class="setup-input purple" placeholder="Paste Personal Access Token…" />
@@ -976,10 +1059,12 @@
 
 <!-- ════ SCRIPT ════ -->
 <script>
-  // ── Portfolio Data ──────────────────────────────────────────────
-  const GOAL        = 120000;
-  const START_VALUE = 81800;
-  const GOAL_DATE   = new Date('2026-12-31T23:59:59');
+  // ── Portfolio Goal (loads from localStorage if user has customised) ─
+  const GOAL_SETTINGS_KEY = 'goal_settings';
+  const _gs = JSON.parse(localStorage.getItem(GOAL_SETTINGS_KEY) || 'null');
+  let GOAL        = _gs ? _gs.goal        : 120000;
+  let START_VALUE = _gs ? _gs.startValue  : 81800;
+  let GOAL_DATE   = _gs ? new Date(_gs.goalDate) : new Date('2026-12-31T23:59:59');
   const PREMIUM_COLLECTED = 2410;
 
   const MILESTONES = [
@@ -1018,13 +1103,16 @@
   function updateSetupState() {
     const setupCard   = document.getElementById('setup-card');
     const settingsBar = document.getElementById('settings-bar');
-    const hasKey = !!apiKey;
-    const hasGit = !!githubPat;
+    const hasKey  = !!apiKey;
+    const hasGoal = !!localStorage.getItem(GOAL_SETTINGS_KEY);
+    const hasGit  = !!githubPat;
 
     const s1 = document.getElementById('step1-num');
     const s2 = document.getElementById('step2-num');
-    if (s1) { s1.textContent = hasKey ? '✓' : '1'; s1.className = hasKey ? 'step-num done' : 'step-num'; }
-    if (s2) { s2.textContent = hasGit ? '✓' : '2'; s2.className = hasGit ? 'step-num done' : 'step-num'; }
+    const s3 = document.getElementById('step3-num');
+    if (s1) { s1.textContent = hasKey  ? '✓' : '1'; s1.className = hasKey  ? 'step-num done' : 'step-num'; }
+    if (s2) { s2.textContent = hasGoal ? '✓' : '2'; s2.className = hasGoal ? 'step-num done' : 'step-num'; }
+    if (s3) { s3.textContent = hasGit  ? '✓' : '3'; s3.className = hasGit  ? 'step-num done' : 'step-num'; }
 
     if (hasKey) {
       setupCard.style.display   = 'none';
@@ -1037,6 +1125,36 @@
       setupCard.style.display   = 'block';
       settingsBar.style.display = 'none';
     }
+  }
+
+  function saveGoalSettings() {
+    const goal      = parseFloat(document.getElementById('goal-input').value)        || GOAL;
+    const startVal  = parseFloat(document.getElementById('start-value-input').value) || START_VALUE;
+    const dateVal   = document.getElementById('goal-date-input').value;
+    const goalDate  = dateVal ? dateVal + 'T23:59:59' : '2026-12-31T23:59:59';
+
+    GOAL        = goal;
+    START_VALUE = startVal;
+    GOAL_DATE   = new Date(goalDate);
+
+    localStorage.setItem(GOAL_SETTINGS_KEY, JSON.stringify({ goal, startValue: startVal, goalDate }));
+
+    const el = document.getElementById('goal-status');
+    if (el) { el.textContent = '✓ Goal saved!'; el.style.color = '#22c55e'; setTimeout(() => { el.textContent = ''; }, 3000); }
+
+    // Re-render everything that uses goal values
+    updateDaysRemaining();
+    updateMilestoneHighlights(null);
+    renderTable(null);
+    drawHistoryChart();
+    renderMorningDigest();
+    updateSetupState();
+
+    // Update the static goal card
+    const goalCard = document.querySelector('.card.green .value');
+    if (goalCard) goalCard.textContent = '$' + goal.toLocaleString();
+    const goalHeader = document.querySelector('.goal-header h2');
+    if (goalHeader) goalHeader.textContent = `🎯 Goal Progress — $${startVal.toLocaleString()} → $${goal.toLocaleString()}`;
   }
 
   function toggleSettingsExpand() {
@@ -1055,6 +1173,9 @@
     if (apiKey)     document.getElementById('api-key-input').value     = apiKey;
     if (githubPat)  document.getElementById('github-pat-input').value  = '••••••••••••••••';
     if (githubRepo) document.getElementById('github-repo-input').value = githubRepo;
+    document.getElementById('goal-input').value        = GOAL;
+    document.getElementById('start-value-input').value = START_VALUE;
+    document.getElementById('goal-date-input').value   = GOAL_DATE.toISOString().slice(0, 10);
 
     updateSetupState();
 
@@ -1903,7 +2024,7 @@
     const prevDay = history.length > 1 ? history[history.length - 2] : null;
     const portVal = latest ? latest.value : null;
     const dayDiff = (portVal && prevDay) ? portVal - prevDay.value : null;
-    const gap     = portVal ? (120000 - portVal) : null;
+    const gap     = portVal ? (GOAL - portVal) : null;
 
     // ── Top movers from live holdings
     const movers = holdings
@@ -1972,7 +2093,7 @@
         <div class="digest-card">
           <div class="dc-label">Gap to $120K Goal</div>
           <div class="dc-value" style="color:#f59e0b;">${gap ? '$' + gap.toLocaleString('en-US', {maximumFractionDigits:0}) : '—'}</div>
-          <div class="dc-sub">${gap && portVal ? ((portVal/120000)*100).toFixed(1) + '% of the way there' : '—'}</div>
+          <div class="dc-sub">${gap && portVal ? ((portVal/GOAL)*100).toFixed(1) + '% of the way there' : '—'}</div>
         </div>
         <div class="digest-card">
           <div class="dc-label">Market Sentiment</div>
