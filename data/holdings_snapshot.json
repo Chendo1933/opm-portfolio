@@ -1,0 +1,69 @@
+{
+  "snapshotDate": "2026-03-24T01:03:20.203Z",
+  "holdings": [
+    {
+      "ticker": "RKLB",
+      "shares": 577.337,
+      "avgCost": 15.36,
+      "livePrice": null,
+      "dailyChange": null,
+      "marketValue": null
+    },
+    {
+      "ticker": "OKLO",
+      "shares": 200.068,
+      "avgCost": 32.77,
+      "livePrice": null,
+      "dailyChange": null,
+      "marketValue": null
+    },
+    {
+      "ticker": "TSLA",
+      "shares": 25,
+      "avgCost": 224.52,
+      "livePrice": null,
+      "dailyChange": null,
+      "marketValue": null
+    },
+    {
+      "ticker": "WMT",
+      "shares": 70.118,
+      "avgCost": 79.13,
+      "livePrice": null,
+      "dailyChange": null,
+      "marketValue": null
+    },
+    {
+      "ticker": "DKNG",
+      "shares": 300.199,
+      "avgCost": 31.94,
+      "livePrice": null,
+      "dailyChange": null,
+      "marketValue": null
+    },
+    {
+      "ticker": "SOFI",
+      "shares": 91.504,
+      "avgCost": 27.32,
+      "livePrice": null,
+      "dailyChange": null,
+      "marketValue": null
+    },
+    {
+      "ticker": "KRKNF",
+      "shares": 400,
+      "avgCost": 5.45,
+      "livePrice": null,
+      "dailyChange": null,
+      "marketValue": null
+    },
+    {
+      "ticker": "SPAXX",
+      "shares": 1757.06,
+      "avgCost": 1,
+      "livePrice": null,
+      "dailyChange": null,
+      "marketValue": null
+    }
+  ]
+}
