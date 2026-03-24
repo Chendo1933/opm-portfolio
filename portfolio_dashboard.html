@@ -89,6 +89,43 @@
     #github-pat-input:focus { outline: none; border-color: #a78bfa; }
     #github-repo-input { width: 210px; }
     #github-repo-input:focus { outline: none; border-color: #a78bfa; }
+    /* ── Portfolio Editor ────────────────────────── */
+    #portfolio-editor {
+      display: none;
+      background: #0f1428; border: 1px solid #1e2744;
+      border-top: 3px solid #22d3ee;
+      border-radius: 10px; padding: 20px 22px; margin-bottom: 16px;
+    }
+    #portfolio-editor h3 { color: #22d3ee; font-size: 0.9rem; margin: 0 0 4px; }
+    #portfolio-editor .pe-sub { font-size: 0.75rem; color: #5a6a8a; margin-bottom: 16px; }
+    .pe-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-bottom: 14px; }
+    .pe-table th { color: #5a6a8a; font-weight: 600; text-align: left; padding: 6px 8px; border-bottom: 1px solid #1e2744; font-size: 0.72rem; text-transform: uppercase; }
+    .pe-table td { padding: 5px 6px; border-bottom: 1px solid #0e1424; vertical-align: middle; }
+    .pe-input {
+      background: #0a0e1a; border: 1px solid #2a3560; color: #e0e6f0;
+      padding: 5px 8px; border-radius: 5px; font-size: 0.8rem; width: 100%;
+    }
+    .pe-input:focus { outline: none; border-color: #22d3ee; }
+    .pe-select {
+      background: #0a0e1a; border: 1px solid #2a3560; color: #e0e6f0;
+      padding: 5px 8px; border-radius: 5px; font-size: 0.8rem; width: 100%;
+    }
+    .pe-del-btn {
+      background: none; border: 1px solid #2a3560; color: #f87171;
+      border-radius: 5px; padding: 4px 8px; cursor: pointer; font-size: 0.75rem;
+    }
+    .pe-del-btn:hover { background: rgba(248,113,113,0.1); }
+    .pe-add-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 14px; }
+    .pe-add-row .pe-field { display: flex; flex-direction: column; gap: 4px; }
+    .pe-add-row .pe-field label { font-size: 0.68rem; color: #5a6a8a; text-transform: uppercase; }
+    .pe-add-row .pe-field input, .pe-add-row .pe-field select {
+      background: #0a0e1a; border: 1px solid #2a3560; color: #e0e6f0;
+      padding: 6px 10px; border-radius: 6px; font-size: 0.8rem;
+    }
+    .pe-add-row .pe-field input:focus, .pe-add-row .pe-field select:focus { outline: none; border-color: #22d3ee; }
+    .pe-ticker-input { width: 90px; text-transform: uppercase; }
+    .pe-num-input   { width: 110px; }
+    .pe-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     /* ── Morning Digest Panel ─────────────────────── */
     #morning-digest {
       background: #0f1428;
@@ -602,7 +639,64 @@
     <button class="btn-sm" onclick="fetchAllPrices()" style="background:#1e2744;color:#22d3ee;font-size:0.75rem;padding:4px 10px;">↻ Refresh Prices</button>
     <button class="btn-sm" id="github-backup-btn2" onclick="backupToGitHub()" style="background:#1e2744;color:#a78bfa;font-size:0.75rem;padding:4px 10px;">☁ Backup</button>
     <button onclick="toggleSettingsExpand()" style="background:none;border:1px solid #1e2744;color:#3a4a6a;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.72rem;">✏ Edit Settings</button>
+    <button onclick="peOpen()" style="background:none;border:1px solid #22d3ee;color:#22d3ee;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.72rem;">📊 Edit Portfolio</button>
     <span id="settings-bar-msg" style="font-size:0.72rem;color:#5a6a8a;"></span>
+  </div>
+</div>
+
+<!-- ════ PORTFOLIO EDITOR ════ -->
+<div id="portfolio-editor">
+  <h3>✏ Edit My Portfolio</h3>
+  <p class="pe-sub">Add or remove positions, update shares and cost basis. Changes save instantly to your browser.</p>
+
+  <table class="pe-table">
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Shares</th>
+        <th>Avg Cost</th>
+        <th>Type</th>
+        <th>Manual Price</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="pe-tbody"></tbody>
+  </table>
+
+  <!-- Add new position -->
+  <div class="pe-add-row">
+    <div class="pe-field">
+      <label>Ticker</label>
+      <input type="text" id="pe-new-ticker" class="pe-ticker-input" placeholder="e.g. AAPL" />
+    </div>
+    <div class="pe-field">
+      <label>Shares</label>
+      <input type="number" id="pe-new-shares" class="pe-num-input" placeholder="100" step="any" min="0" />
+    </div>
+    <div class="pe-field">
+      <label>Avg Cost ($)</label>
+      <input type="number" id="pe-new-cost" class="pe-num-input" placeholder="50.00" step="any" min="0" />
+    </div>
+    <div class="pe-field">
+      <label>Type</label>
+      <select id="pe-new-type">
+        <option value="hold|Hold">Hold</option>
+        <option value="cc|CC Engine">CC Engine</option>
+        <option value="otc|OTC">OTC (manual price)</option>
+        <option value="cash|Cash">Cash / Money Market</option>
+      </select>
+    </div>
+    <div class="pe-field">
+      <label>&nbsp;</label>
+      <button class="btn-sm" onclick="peAddRow()" style="white-space:nowrap;">+ Add Position</button>
+    </div>
+  </div>
+
+  <div class="pe-actions">
+    <button class="btn-sm" onclick="peSave()" style="background:#22c55e;color:#000;">✓ Save Portfolio</button>
+    <button class="btn-sm" onclick="peReset()" style="background:#1e2744;color:#f87171;">↺ Reset to Defaults</button>
+    <button onclick="peClose()" style="background:none;border:1px solid #1e2744;color:#5a6a8a;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:0.8rem;">✕ Close</button>
+    <span id="pe-status" style="font-size:0.75rem;color:#5a6a8a;"></span>
   </div>
 </div>
 
@@ -900,16 +994,19 @@
     { id: 'ms-nov', value: 119000, month: 11 },
   ];
 
-  const holdings = [
+  const DEFAULT_HOLDINGS = [
     { ticker: 'RKLB',  shares: 577.337, avgCost: 15.36, tag: 'cc',   tagLabel: 'CC Engine',    manualPrice: null },
-    { ticker: 'OKLO',  shares: 200.068, avgCost: 32.77, tag: 'cc',   tagLabel: 'CC Engine 2',   manualPrice: null },
-    { ticker: 'TSLA',  shares: 25,      avgCost: 224.52,tag: 'hold', tagLabel: 'Hold',           manualPrice: null },
-    { ticker: 'WMT',   shares: 70.118,  avgCost: 79.13, tag: 'hold', tagLabel: 'Defensive',     manualPrice: null },
-    { ticker: 'DKNG',  shares: 300.199, avgCost: 31.94, tag: 'cc',   tagLabel: 'CC Engine 3',   manualPrice: null },
-    { ticker: 'SOFI',  shares: 91.504,  avgCost: 27.32, tag: 'hold', tagLabel: 'Monitor',       manualPrice: null },
-    { ticker: 'KRKNF', shares: 400,     avgCost: 5.45,  tag: 'otc',  tagLabel: 'OTC',           manualPrice: 5.45 },
-    { ticker: 'SPAXX', shares: 1757.06, avgCost: 1.00,  tag: 'cash', tagLabel: 'Cash',          manualPrice: 1.00 },
+    { ticker: 'OKLO',  shares: 200.068, avgCost: 32.77, tag: 'cc',   tagLabel: 'CC Engine 2',  manualPrice: null },
+    { ticker: 'TSLA',  shares: 25,      avgCost: 224.52,tag: 'hold', tagLabel: 'Hold',          manualPrice: null },
+    { ticker: 'WMT',   shares: 70.118,  avgCost: 79.13, tag: 'hold', tagLabel: 'Defensive',    manualPrice: null },
+    { ticker: 'DKNG',  shares: 300.199, avgCost: 31.94, tag: 'cc',   tagLabel: 'CC Engine 3',  manualPrice: null },
+    { ticker: 'SOFI',  shares: 91.504,  avgCost: 27.32, tag: 'hold', tagLabel: 'Monitor',      manualPrice: null },
+    { ticker: 'KRKNF', shares: 400,     avgCost: 5.45,  tag: 'otc',  tagLabel: 'OTC',          manualPrice: 5.45 },
+    { ticker: 'SPAXX', shares: 1757.06, avgCost: 1.00,  tag: 'cash', tagLabel: 'Cash',         manualPrice: 1.00 },
   ];
+  // Load from localStorage if user has saved their own portfolio; else use defaults
+  const HOLDINGS_KEY = 'custom_holdings';
+  const holdings = JSON.parse(localStorage.getItem(HOLDINGS_KEY) || 'null') || DEFAULT_HOLDINGS.map(h => ({...h}));
 
   let apiKey = localStorage.getItem('finnhub_api_key') || '';
   let refreshTimer = 120;
@@ -1901,6 +1998,106 @@
         <span style="cursor:pointer;color:#6e40c9;text-decoration:underline;" onclick="backupToGitHub()">Backup now</span>
       </div>
     `;
+  }
+
+  // ── Portfolio Editor ─────────────────────────────────────────────
+  const TAG_OPTIONS = [
+    { value: 'hold',  label: 'Hold'       },
+    { value: 'cc',    label: 'CC Engine'  },
+    { value: 'otc',   label: 'OTC'        },
+    { value: 'cash',  label: 'Cash'       },
+  ];
+
+  function peOpen() {
+    document.getElementById('portfolio-editor').style.display = 'block';
+    document.getElementById('portfolio-editor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    peRenderTable();
+  }
+
+  function peClose() {
+    document.getElementById('portfolio-editor').style.display = 'none';
+  }
+
+  function peRenderTable() {
+    const tbody = document.getElementById('pe-tbody');
+    tbody.innerHTML = holdings.map((h, i) => {
+      const tagOpts = TAG_OPTIONS.map(t =>
+        `<option value="${t.value}" ${h.tag === t.value ? 'selected' : ''}>${t.label}</option>`
+      ).join('');
+      const manualVal = h.manualPrice !== null ? h.manualPrice : '';
+      return `
+        <tr id="pe-row-${i}">
+          <td><strong style="color:#22d3ee;">${h.ticker}</strong></td>
+          <td><input class="pe-input" type="number" step="any" min="0" value="${h.shares}" onchange="peUpdate(${i},'shares',this.value)" style="width:100px;" /></td>
+          <td><input class="pe-input" type="number" step="any" min="0" value="${h.avgCost}" onchange="peUpdate(${i},'avgCost',this.value)" style="width:100px;" /></td>
+          <td><select class="pe-select" onchange="peUpdate(${i},'tag',this.value)" style="width:120px;">${tagOpts}</select></td>
+          <td><input class="pe-input" type="number" step="any" min="0" value="${manualVal}" placeholder="live" onchange="peUpdate(${i},'manualPrice',this.value)" style="width:90px;" /></td>
+          <td><button class="pe-del-btn" onclick="peDelete(${i})">✕ Remove</button></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function peUpdate(i, field, val) {
+    if (field === 'shares' || field === 'avgCost') {
+      holdings[i][field] = parseFloat(val) || 0;
+    } else if (field === 'manualPrice') {
+      holdings[i][field] = val === '' ? null : parseFloat(val) || null;
+    } else if (field === 'tag') {
+      const labels = { hold: 'Hold', cc: 'CC Engine', otc: 'OTC', cash: 'Cash' };
+      holdings[i].tag      = val;
+      holdings[i].tagLabel = labels[val] || val;
+    }
+  }
+
+  function peDelete(i) {
+    holdings.splice(i, 1);
+    peRenderTable();
+    document.getElementById('pe-status').textContent = 'Removed — click Save to confirm.';
+    document.getElementById('pe-status').style.color = '#f59e0b';
+  }
+
+  function peAddRow() {
+    const ticker = document.getElementById('pe-new-ticker').value.trim().toUpperCase();
+    const shares = parseFloat(document.getElementById('pe-new-shares').value) || 0;
+    const cost   = parseFloat(document.getElementById('pe-new-cost').value)   || 0;
+    const typeVal= document.getElementById('pe-new-type').value;
+    const [tag, tagLabel] = typeVal.split('|');
+
+    if (!ticker) { alert('Please enter a ticker symbol.'); return; }
+    if (holdings.find(h => h.ticker === ticker)) { alert(`${ticker} is already in your portfolio.`); return; }
+
+    const isOtcOrCash = tag === 'otc' || tag === 'cash';
+    holdings.push({ ticker, shares, avgCost: cost, tag, tagLabel, manualPrice: isOtcOrCash ? cost : null });
+
+    // Clear inputs
+    document.getElementById('pe-new-ticker').value = '';
+    document.getElementById('pe-new-shares').value = '';
+    document.getElementById('pe-new-cost').value   = '';
+
+    peRenderTable();
+    document.getElementById('pe-status').textContent = `${ticker} added — click Save to confirm.`;
+    document.getElementById('pe-status').style.color = '#22d3ee';
+  }
+
+  function peSave() {
+    localStorage.setItem(HOLDINGS_KEY, JSON.stringify(holdings));
+    document.getElementById('pe-status').textContent = '✓ Portfolio saved! Refreshing prices…';
+    document.getElementById('pe-status').style.color = '#22c55e';
+    // Re-render everything with new holdings
+    renderTable(null);
+    if (apiKey) fetchAllPrices().then(() => renderMorningDigest());
+    setTimeout(peClose, 1200);
+  }
+
+  function peReset() {
+    if (!confirm('Reset to default holdings? This will remove your custom portfolio.')) return;
+    localStorage.removeItem(HOLDINGS_KEY);
+    // Repopulate holdings array from defaults
+    holdings.length = 0;
+    DEFAULT_HOLDINGS.forEach(h => holdings.push({...h}));
+    peRenderTable();
+    document.getElementById('pe-status').textContent = 'Reset to defaults — click Save to confirm.';
+    document.getElementById('pe-status').style.color = '#f59e0b';
   }
 
   // ── Formatters ──────────────────────────────────────────────────
