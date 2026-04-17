@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monthly Review — $120K Mission</title>
+  <title>Monthly Review — O.P.M. Portfolio</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #080c18; color: #c9d4e8; font-family: 'Segoe UI', system-ui, sans-serif; padding: 24px 20px 60px; }
@@ -151,7 +151,7 @@
 <!-- ════ HEADER ════ -->
 <div class="header">
   <div>
-    <h1>📊 Monthly Review — <span>$120K Mission</span></h1>
+    <h1>📊 Monthly Review — <span>O.P.M. Portfolio</span></h1>
     <div style="font-size:0.75rem;color:#5a6a8a;margin-top:4px;">Track actual vs targets · Log wins and lessons · Stay on pace</div>
   </div>
   <div class="nav">
@@ -220,15 +220,15 @@
       <input type="number" id="f-cycles" step="1" placeholder="1" min="0">
     </div>
     <div class="form-group">
-      <label>TSLA Shares Accumulated (total)</label>
-      <input type="number" id="f-tsla-shares" step="1" placeholder="20">
+      <label id="f-accum-label">Shares Accumulated (total)</label>
+      <input type="number" id="f-tsla-shares" step="1" placeholder="0">
     </div>
   </div>
 
   <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
     <div class="form-group">
       <label>🏆 Wins / What Worked</label>
-      <textarea id="f-wins" placeholder="e.g. RKLB calls expired OTM, collected full $2,410…"></textarea>
+      <textarea id="f-wins" placeholder="e.g. Calls expired OTM, collected full premium…"></textarea>
     </div>
     <div class="form-group">
       <label>📚 Lessons Learned</label>
@@ -236,15 +236,18 @@
     </div>
     <div class="form-group">
       <label>🎯 Next Month Focus</label>
-      <textarea id="f-focus" placeholder="e.g. Sell Cycle 2 calls, add 20 TSLA shares…"></textarea>
+      <textarea id="f-focus" placeholder="e.g. Sell next CC cycle, add to core holdings…"></textarea>
     </div>
   </div>
 
   <div class="form-actions">
     <button class="btn btn-primary" onclick="saveReview()">💾 Save Review</button>
+    <button class="btn btn-secondary" onclick="autofillFromPortfolio()"
+            style="background:#0e2a3a;border-color:#22d3ee;color:#22d3ee;">⚡ Auto-fill from Portfolio</button>
     <button class="btn btn-secondary" onclick="clearForm()">Clear</button>
     <button class="btn btn-secondary" id="btn-delete-review" onclick="deleteReview()" style="display:none;color:#f87171;border-color:#4a1a1a;">Delete Entry</button>
   </div>
+  <div id="autofill-status" style="font-size:0.72rem;color:#5a6a8a;margin-top:8px;min-height:1.1em;"></div>
 </div>
 
 <!-- ════ REFLECTIONS ════ -->
@@ -269,7 +272,7 @@
         <th class="align-right">Variance</th>
         <th class="align-right">Premium</th>
         <th class="align-right">Deployed</th>
-        <th class="align-right">TSLA Shares</th>
+        <th class="align-right" id="th-accum-shares">Shares</th>
         <th>Status</th>
       </tr>
     </thead>
@@ -292,32 +295,56 @@
 <!-- ════ SCRIPT ════ -->
 <script>
 // ── Plan data ──────────────────────────────────────────────────────
-const MONTHS = [
-  { key: 'feb', label: 'February',  short: 'FEB', target: 81800,  month: 2 },
-  { key: 'mar', label: 'March',     short: 'MAR', target: 86600,  month: 3 },
-  { key: 'apr', label: 'April',     short: 'APR', target: 91000,  month: 4 },
-  { key: 'may', label: 'May',       short: 'MAY', target: 95500,  month: 5 },
-  { key: 'jun', label: 'June',      short: 'JUN', target: 101000, month: 6 },
-  { key: 'jul', label: 'July',      short: 'JUL', target: 106000, month: 7 },
-  { key: 'aug', label: 'August',    short: 'AUG', target: 110500, month: 8 },
-  { key: 'sep', label: 'September', short: 'SEP', target: 114500, month: 9 },
-  { key: 'oct', label: 'October',   short: 'OCT', target: 117000, month: 10 },
-  { key: 'nov', label: 'November',  short: 'NOV', target: 119000, month: 11 },
-  { key: 'dec', label: 'December',  short: 'DEC', target: 120000, month: 12 },
-];
+// Load milestone targets from the dashboard's custom_milestones localStorage key,
+// so the monthly review stays in sync with the user's goal plan.
+function loadMonths() {
+  const customMs = JSON.parse(localStorage.getItem('custom_milestones') || 'null');
+  const goalSettings = JSON.parse(localStorage.getItem('goal_settings') || 'null');
+  const startValue = goalSettings ? goalSettings.startValue : 0;
+  const goalValue  = goalSettings ? goalSettings.goal       : 120000;
 
-// Premium targets per month (cumulative from plan)
-const PREMIUM_TARGETS = {
-  feb: 2410, mar: 4800, apr: 7200, may: 9600,
-  jun: 14000, jul: 18400, aug: 22800, sep: 27200,
-  oct: 29700, nov: 32200, dec: 33600
-};
+  // Default milestone ladder (mirrors dashboard's DEFAULT_MILESTONES)
+  const DEFAULTS = [
+    { label: 'MAR', value: 86600,  month: 3 },
+    { label: 'APR', value: 91000,  month: 4 },
+    { label: 'MAY', value: 95500,  month: 5 },
+    { label: 'JUN', value: 101000, month: 6 },
+    { label: 'JUL', value: 106000, month: 7 },
+    { label: 'AUG', value: 110500, month: 8 },
+    { label: 'SEP', value: 114500, month: 9 },
+    { label: 'OCT', value: 117000, month: 10 },
+    { label: 'NOV', value: 119000, month: 11 },
+  ];
+  const ms = customMs || DEFAULTS;
+  const monthKeys = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  const monthLabels = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-// TSLA share accumulation targets
-const TSLA_TARGETS = {
-  feb: 20, mar: 35, apr: 55, may: 80,
-  jun: 100, jul: 100, aug: 100, sep: 100, oct: 100, nov: 100, dec: 100
-};
+  const months = [];
+  months.push({ key: 'feb', label: 'February', short: 'FEB', target: startValue, month: 2 });
+  ms.forEach(m => {
+    months.push({
+      key: monthKeys[m.month - 1],
+      label: monthLabels[m.month - 1],
+      short: (m.label || monthKeys[m.month - 1]).toUpperCase(),
+      target: m.value,
+      month: m.month,
+    });
+  });
+  months.push({ key: 'dec', label: 'December', short: 'DEC', target: goalValue, month: 12 });
+  return months;
+}
+
+const MONTHS = loadMonths();
+
+// Premium targets per month (cumulative) — user-configurable via localStorage key
+// 'premium_monthly_targets'. Shape: { feb: 2410, mar: 4800, ... }
+// Empty by default — scorecard will show "no target set" gracefully.
+const PREMIUM_TARGETS = JSON.parse(localStorage.getItem('premium_monthly_targets') || '{}');
+
+// Share accumulation tracking — user picks any ticker they're building up to 100 shares
+// via localStorage key 'accumulation_config'. Shape: { ticker: 'TSLA', monthlyTargets: { feb: 20, ... } }
+// If not set, the "Share Accumulation" scorecard is hidden entirely.
+const ACCUMULATION_CONFIG = JSON.parse(localStorage.getItem('accumulation_config') || 'null');
 
 const STORAGE_KEY = 'monthly_reviews';
 let reviews = loadReviews();
@@ -337,6 +364,13 @@ function saveReviews() {
 
 // ── Init ───────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
+  // Update accumulation label to reflect configured ticker
+  if (ACCUMULATION_CONFIG && ACCUMULATION_CONFIG.ticker) {
+    const lbl = document.getElementById('f-accum-label');
+    const thL = document.getElementById('th-accum-shares');
+    if (lbl) lbl.textContent = ACCUMULATION_CONFIG.ticker + ' Shares Accumulated (total)';
+    if (thL) thL.textContent = ACCUMULATION_CONFIG.ticker + ' Shares';
+  }
   buildMonthButtons();
   selectMonth(currentMonth.key);
 });
@@ -407,6 +441,78 @@ function clearForm() {
     .forEach(id => document.getElementById(id).value = '');
 }
 
+// ── Auto-fill from Portfolio Data ──────────────────────────────────
+// Reads live data written by portfolio_dashboard / premium_log / options_tracker:
+//   - portfolio_value_history  (dashboard snapshots)
+//   - premium_cycles           (premium_log entries)
+//   - custom_holdings          (current positions)
+// Populates form for the selected month, then you review & hit Save.
+function autofillFromPortfolio() {
+  const statusEl = document.getElementById('autofill-status');
+  const m = MONTHS.find(x => x.key === selectedMonth);
+  if (!m) return;
+  const monthNum = m.month;
+  const year = 2026;
+  const filled = [];
+
+  // 1) Portfolio Value — prefer snapshot dated in this month; else latest known.
+  const history = JSON.parse(localStorage.getItem('portfolio_value_history') || '[]');
+  if (history.length) {
+    // Last snapshot dated yyyy-MM where MM matches
+    const matchMonth = history.filter(h => {
+      const d = new Date(h.date);
+      return d.getMonth() + 1 === monthNum && d.getFullYear() === year;
+    });
+    const snap = matchMonth.length ? matchMonth[matchMonth.length - 1] : history[history.length - 1];
+    if (snap && snap.value) {
+      document.getElementById('f-value').value = Math.round(snap.value);
+      filled.push('value');
+    }
+  }
+
+  // 2) Premium + Cycles — sum cycles whose expiry falls in this month
+  const cycles = JSON.parse(localStorage.getItem('premium_cycles') || '[]');
+  let premThisMonth = 0;
+  let cyclesThisMonth = 0;
+  cycles.forEach(c => {
+    const dateStr = c.expiry || c.open;
+    if (!dateStr) return;
+    const d = new Date(dateStr);
+    if (d.getMonth() + 1 === monthNum && d.getFullYear() === year) {
+      premThisMonth += (c.premium || 0) * (c.contracts || 0) * 100;
+      cyclesThisMonth += 1;
+    }
+  });
+  if (premThisMonth > 0) {
+    document.getElementById('f-premium').value = Math.round(premThisMonth);
+    filled.push('premium');
+  }
+  if (cyclesThisMonth > 0) {
+    document.getElementById('f-cycles').value = cyclesThisMonth;
+    filled.push('cycles');
+  }
+
+  // 3) Accumulation shares — from custom_holdings + accumulation_config
+  const holdings = JSON.parse(localStorage.getItem('custom_holdings') || '[]');
+  const accumCfg = JSON.parse(localStorage.getItem('accumulation_config') || 'null');
+  const accumTicker = accumCfg && accumCfg.ticker;
+  if (accumTicker) {
+    const h = holdings.find(x => x.ticker === accumTicker);
+    if (h && h.shares != null) {
+      document.getElementById('f-tsla-shares').value = Math.floor(h.shares);
+      filled.push(accumTicker + ' shares');
+    }
+  }
+
+  if (filled.length) {
+    statusEl.textContent = '✓ Auto-filled: ' + filled.join(', ') + '. Review the values and click Save Review.';
+    statusEl.style.color = '#22c55e';
+  } else {
+    statusEl.textContent = '⚠ No portfolio data found for ' + m.label + '. Run the dashboard / premium log first.';
+    statusEl.style.color = '#f59e0b';
+  }
+}
+
 function deleteReview() {
   if (!confirm('Delete review for ' + MONTHS.find(m => m.key === selectedMonth).label + '?')) return;
   delete reviews[selectedMonth];
@@ -432,7 +538,10 @@ function renderScoreBanner(key) {
   }
 
   // Score: how far between last target and this target did you land?
-  const prevTarget = key === 'feb' ? 81800 : MONTHS[MONTHS.findIndex(x => x.key === key) - 1].target;
+  const idx = MONTHS.findIndex(x => x.key === key);
+  const gs = JSON.parse(localStorage.getItem('goal_settings') || 'null');
+  const startValue = gs ? gs.startValue : 0;
+  const prevTarget = idx <= 0 ? startValue : MONTHS[idx - 1].target;
   const range = m.target - prevTarget;
   const actual = r.value - prevTarget;
   const pct = range > 0 ? Math.min(Math.round((actual / range) * 100), 120) : 100;
@@ -487,42 +596,49 @@ function renderScorecards(key) {
   // 2. Premium Income
   const premTarget = PREMIUM_TARGETS[key] || 0;
   const premActual = reviews[key].premium || 0;
-  // Cumulative actual
-  let cumPrem = 0;
-  MONTHS.forEach(mm => { if (reviews[mm.key]) cumPrem += reviews[mm.key].premium || 0; });
-  // This month cumulative
+  // This-month-cumulative actual across logged reviews
   let cumPremToKey = 0;
   for (let i = 0; i <= MONTHS.findIndex(x => x.key === key); i++) {
     const mk = MONTHS[i].key;
     if (reviews[mk]) cumPremToKey += reviews[mk].premium || 0;
   }
   const premVar = cumPremToKey - premTarget;
+  const premMetrics = [
+    { label: 'This month', actual: '$' + premActual.toLocaleString() },
+    { label: 'Cumulative', actual: '$' + cumPremToKey.toLocaleString(),
+      target: premTarget > 0 ? 'target $' + premTarget.toLocaleString() : null },
+  ];
+  if (premTarget > 0) {
+    premMetrics.push({
+      label: 'Cum. variance', actual: fmtVariance(premVar),
+      variance: { val: premVar, pct: ((premVar / premTarget) * 100).toFixed(1) },
+    });
+  }
   grid.innerHTML += makeScorecardHTML(
     'Premium Income',
-    gradeVariance(premVar, premTarget),
-    [
-      { label: 'This month',    actual: '$' + premActual.toLocaleString() },
-      { label: 'Cumulative',    actual: '$' + cumPremToKey.toLocaleString(), target: 'target $' + premTarget.toLocaleString() },
-      { label: 'Cum. variance', actual: fmtVariance(premVar),
-        variance: { val: premVar, pct: premTarget > 0 ? ((premVar / premTarget) * 100).toFixed(1) : 0 } },
-    ]
+    premTarget > 0 ? gradeVariance(premVar, premTarget) : (premActual > 0 ? 'a' : 'na'),
+    premMetrics
   );
 
-  // 3. TSLA Accumulation
-  const tslaTarget = TSLA_TARGETS[key] || 100;
-  const tslaActual = r.tslaShares || 0;
-  const tslaVar    = tslaActual - tslaTarget;
-  grid.innerHTML += makeScorecardHTML(
-    'TSLA Accumulation',
-    gradeVariance(tslaVar, tslaTarget),
-    [
-      { label: 'Target shares',  actual: tslaTarget },
-      { label: 'Actual shares',  actual: tslaActual || '—' },
-      { label: 'Variance',       actual: tslaActual ? fmtVariance(tslaVar) + ' shares' : '—',
-        variance: tslaActual ? { val: tslaVar, pct: ((tslaVar / tslaTarget) * 100).toFixed(1) } : null },
-      { label: 'CC unlock',      actual: tslaActual >= 100 ? '🟢 Unlocked!' : '🔒 Need ' + (100 - tslaActual) + ' more' },
-    ]
-  );
+  // 3. Share Accumulation (optional — only shown if user configured ACCUMULATION_CONFIG)
+  if (ACCUMULATION_CONFIG && ACCUMULATION_CONFIG.ticker) {
+    const accTicker  = ACCUMULATION_CONFIG.ticker;
+    const accTargets = ACCUMULATION_CONFIG.monthlyTargets || {};
+    const accTarget  = accTargets[key] || 100;
+    const accActual  = r.tslaShares || 0; // field is named tslaShares for back-compat — stores any ticker's count
+    const accVar     = accActual - accTarget;
+    grid.innerHTML += makeScorecardHTML(
+      accTicker + ' Accumulation',
+      gradeVariance(accVar, accTarget),
+      [
+        { label: 'Target shares',  actual: accTarget },
+        { label: 'Actual shares',  actual: accActual || '—' },
+        { label: 'Variance',       actual: accActual ? fmtVariance(accVar) + ' shares' : '—',
+          variance: accActual ? { val: accVar, pct: ((accVar / accTarget) * 100).toFixed(1) } : null },
+        { label: 'CC unlock',      actual: accActual >= 100 ? '🟢 Unlocked!' : '🔒 Need ' + (100 - accActual) + ' more' },
+      ]
+    );
+  }
 
   // 4. CC Cycles
   const cyclesLogged = r.cycles || 0;
@@ -755,7 +871,7 @@ function drawMomentumChart() {
   const premPoints = [];
   MONTHS.forEach((m, i) => {
     const r = reviews[m.key];
-    if (r) { cumPrem += r.premium || 0; premPoints.push({ i, val: 81800 + cumPrem }); }
+    if (r) { cumPrem += r.premium || 0; const _gs = JSON.parse(localStorage.getItem('goal_settings') || 'null'); const sv = _gs ? _gs.startValue : 0; premPoints.push({ i, val: sv + cumPrem }); }
   });
   if (premPoints.length >= 1) {
     ctx.beginPath();

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Potential Investments — $120K Mission</title>
+  <title>Potential Investments — O.P.M. Portfolio</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #080c18; color: #c9d4e8; font-family: 'Segoe UI', system-ui, sans-serif; padding: 24px 20px 60px; }
@@ -254,15 +254,17 @@
 </div>
 
 <script>
-// ── Portfolio context ─────────────────────────────────────────────────
-const HOLDINGS = {
-  RKLB: { shares: 577.337, avgCost: 15.36 },
-  OKLO: { shares: 200.068, avgCost: 32.77 },
-  TSLA: { shares: 20,      avgCost: 182.87, targetShares: 100, note: 'Need 80 more to unlock covered calls' },
-  WMT:  { shares: 70.118,  avgCost: 79.13 },
-  DKNG: { shares: 300.199, avgCost: 31.94 },
-  SOFI: { shares: 91.504,  avgCost: 27.32 },
-};
+// ── Portfolio context (read dynamically from dashboard's custom_holdings) ──
+function loadHoldingsMap() {
+  const raw = JSON.parse(localStorage.getItem('custom_holdings') || '[]');
+  const out = {};
+  raw.forEach(h => {
+    if (!h.ticker) return;
+    out[h.ticker] = { shares: h.shares || 0, avgCost: h.avgCost || 0, tag: h.tag };
+  });
+  return out;
+}
+const HOLDINGS = loadHoldingsMap();
 
 const TAG_CONFIG = {
   existing:   { label: 'Existing',   cls: 'tag-existing' },
@@ -271,20 +273,23 @@ const TAG_CONFIG = {
   accumulate: { label: 'Accumulate', cls: 'tag-accumulate' },
   winner:     { label: 'Winner',     cls: 'tag-winner' },
   defensive:  { label: 'Defensive',  cls: 'tag-defensive' },
-  quantum:    { label: 'Quantum',    cls: 'tag-quantum' },
-  saas:       { label: 'SaaS',       cls: 'tag-saas' },
 };
 
-let candidates = [
-  { id:'DKNG', ticker:'DKNG', name:'DraftKings',     existing:true,  tags:['existing','avgdown'],    note:'Underwater avg down. Current avg: <strong>$31.94</strong> · <span class="underwater">Unrealized loss</span>. High recovery potential but most exposed to risk-off.' },
-  { id:'TSLA', ticker:'TSLA', name:'Tesla',           existing:true,  tags:['existing','accumulate'], note:'Accumulating 80 more shares to unlock covered calls. Current avg: <strong>$182.87</strong>. Each share brings you closer to the June dual-engine unlock.' },
-  { id:'SOFI', ticker:'SOFI', name:'SoFi Technologies',existing:true, tags:['existing','avgdown'],    note:'Underwater position. Current avg: <strong>$27.32</strong> · <span class="underwater">Unrealized loss</span>. Fintech recovery play.' },
-  { id:'IONQ', ticker:'IONQ', name:'IonQ Inc.',       existing:false, tags:['new','quantum'],         note:'Quantum computing — high growth, high volatility. New position candidate from your watchlist.' },
-  { id:'NOW',  ticker:'NOW',  name:'ServiceNow',      existing:false, tags:['new','saas'],            note:'Enterprise SaaS compounder. High quality business. Trades at a premium. From your $2,000 reserve watchlist.' },
-  { id:'RKLB', ticker:'RKLB', name:'Rocket Lab',      existing:true,  tags:['existing','winner'],     note:'Primary CC engine. Adding shares increases covered call income potential. Defense/space tailwind.' },
-  { id:'OKLO', ticker:'OKLO', name:'Oklo Inc.',       existing:true,  tags:['existing','winner'],     note:'Strong winner — nuclear tailwind. Hold recommended, but adding on dips builds the position.' },
-  { id:'WMT',  ticker:'WMT',  name:'Walmart',         existing:true,  tags:['existing','defensive'],  note:'Defensive safe haven. Benefits from risk-off environments. Adds portfolio stability.' },
-];
+// Build candidates dynamically from your holdings.
+// Optionally extend via localStorage key 'deployment_candidates' — shape matches { id, ticker, name, existing, tags, note }.
+function buildCandidates() {
+  const extra = JSON.parse(localStorage.getItem('deployment_candidates') || '[]');
+  const existingList = Object.entries(HOLDINGS).map(([ticker, h]) => ({
+    id: ticker,
+    ticker,
+    name: ticker,
+    existing: true,
+    tags: ['existing'],
+    note: `Current avg cost: <strong>$${(h.avgCost||0).toFixed(2)}</strong> · ${Math.floor(h.shares||0)} shares held. Adjust allocation based on conviction, diversification, and tax lots.`,
+  }));
+  return existingList.concat(extra);
+}
+let candidates = buildCandidates();
 
 let livePrices  = {};
 let earningsCache = {};
@@ -548,71 +553,57 @@ function generateRecommendation() {
   const recs  = [];
   let   budget = total;
 
-  // Score each selection
+  // Score each selection — generic tag-driven logic.
+  // Tags on each candidate drive priority: 'avgdown', 'accumulate', 'winner', 'defensive', 'new'.
   const scored = selIds.map(id => {
     const c = candidates.find(x => x.id === id);
     const h = HOLDINGS[c.ticker];
     const p = livePrices[c.ticker];
-    let score = 0, reason = '', priority = 'normal';
+    let score = 40, reason = '', priority = 'normal', sugPct = 1 / Math.max(1, selIds.length);
 
-    if (c.ticker === 'TSLA' && h) {
-      // TSLA: calculate exact cost to reach 100 shares
-      const need        = Math.max(0, (h.targetShares || 100) - h.shares);
-      const exactCost   = p ? Math.min(need * p.c, total * 0.6) : total * 0.4;
+    // Accumulate: position to be built up (e.g. to reach 100 shares for a CC contract)
+    if (c.tags.includes('accumulate') && h) {
+      const target = h.targetShares || 100;
+      const need = Math.max(0, target - h.shares);
+      const exactCost = p ? Math.min(need * p.c, total * 0.6) : total * 0.4;
       score = 90; priority = 'high';
-      reason = `<strong>Unlocks June covered calls.</strong> Need ~${need.toFixed(0)} more shares${p ? ` ≈ $${(need * p.c).toFixed(0)} at live price` : ''}. Dual-engine = ~$4K/mo extra from June onward.`;
+      reason = `<strong>Accumulation target.</strong> Need ~${need.toFixed(0)} more shares${p ? ` ≈ $${(need * p.c).toFixed(0)} at live price` : ''} to hit ${target}-share threshold.`;
       return { id, c, score, priority, suggestedAmt: Math.round(Math.min(exactCost, budget * 0.55)), reason };
     }
 
-    if (c.ticker === 'DKNG' && h) {
-      const pctDown = p ? ((h.avgCost - p.c) / h.avgCost * 100) : 20;
-      score = 60 + Math.min(pctDown, 30);
+    // Avg-down: add while below cost basis
+    if (c.tags.includes('avgdown') && h) {
+      const pctDown = p ? ((h.avgCost - p.c) / h.avgCost * 100) : 15;
+      score = 55 + Math.min(Math.max(pctDown, 0), 30);
       priority = pctDown > 15 ? 'high' : 'normal';
-      const sugPct = pctDown > 20 ? 0.40 : 0.25;
-      reason = `<strong>Avg down opportunity.</strong> ${pctDown.toFixed(1)}% below your cost basis. ${pctDown > 20 ? 'Significant discount — aggressive avg down makes sense.' : 'Moderate discount — partial avg down reduces cost basis.'}`;
+      sugPct = pctDown > 20 ? 0.35 : pctDown > 10 ? 0.22 : 0.15;
+      reason = `<strong>Avg down opportunity.</strong> ${pctDown.toFixed(1)}% below cost basis. ${pctDown > 20 ? 'Significant discount — aggressive avg down.' : 'Moderate discount — partial avg down reduces cost basis.'}`;
       return { id, c, score, priority, suggestedAmt: Math.round(total * sugPct), reason };
     }
 
-    if (c.ticker === 'SOFI' && h) {
-      const pctDown = p ? ((h.avgCost - p.c) / h.avgCost * 100) : 15;
-      score = 45 + Math.min(pctDown, 20);
-      reason = `<strong>Avg down — lower priority than DKNG.</strong> ${pctDown.toFixed(1)}% below cost. Smaller allocation appropriate until recovery trend confirms.`;
-      return { id, c, score, priority: 'low', suggestedAmt: Math.round(total * 0.15), reason };
-    }
-
-    if (c.ticker === 'RKLB' && h) {
+    // Winner: position that's working — add on strength
+    if (c.tags.includes('winner') && h) {
       score = 55;
-      reason = `<strong>CC engine builder.</strong> More RKLB shares = more contracts = more premium income. Each 100 shares = 1 more contract ≈ $480/cycle.`;
+      reason = `<strong>Winner — add on strength.</strong> This is one of your working positions. Adding compounds conviction.`;
       return { id, c, score, priority: 'normal', suggestedAmt: Math.round(total * 0.20), reason };
     }
 
-    if (c.ticker === 'IONQ') {
-      score = 40;
-      reason = `<strong>Speculative growth.</strong> High-volatility quantum play — cap at 15–20% to limit downside. Good asymmetric upside potential.`;
-      return { id, c, score, priority: 'low', suggestedAmt: Math.round(total * 0.15), reason };
-    }
-
-    if (c.ticker === 'NOW') {
-      score = 50;
-      reason = `<strong>Quality compounder.</strong> Expensive but high-quality SaaS. Even fractional shares have strong long-term track record.`;
-      return { id, c, score, priority: 'normal', suggestedAmt: Math.round(total * 0.20), reason };
-    }
-
-    if (c.ticker === 'OKLO' && h) {
-      score = 55;
-      reason = `<strong>Winner — add on strength.</strong> Nuclear tailwind continues. Adding builds position in your best-performing holding.`;
-      return { id, c, score, priority: 'normal', suggestedAmt: Math.round(total * 0.20), reason };
-    }
-
-    if (c.ticker === 'WMT' && h) {
+    // Defensive: safe haven / low beta
+    if (c.tags.includes('defensive') && h) {
       score = 35;
-      reason = `<strong>Defensive add.</strong> Safe haven in volatile environments. Lower growth potential but protects portfolio in drawdowns.`;
+      reason = `<strong>Defensive add.</strong> Safe haven in volatile environments. Lower growth but protects in drawdowns.`;
       return { id, c, score, priority: 'low', suggestedAmt: Math.round(total * 0.10), reason };
     }
 
-    // Custom / unknown
-    score = 30;
-    reason = `<strong>Custom position.</strong> No specific strategy context — equal allocation applied.`;
+    // New position from watchlist
+    if (c.tags.includes('new')) {
+      score = 45;
+      reason = `<strong>New position.</strong> Speculative or watchlist entry — cap allocation to limit downside.`;
+      return { id, c, score, priority: 'low', suggestedAmt: Math.round(total * 0.15), reason };
+    }
+
+    // Fallback: equal weight
+    reason = `<strong>Standard allocation.</strong> No specific tag-driven strategy — equal weighting applied.`;
     return { id, c, score, priority: 'normal', suggestedAmt: Math.round(total / selIds.length), reason };
   });
 

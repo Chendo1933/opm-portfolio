@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Active Options Tracker — $120K Mission</title>
+  <title>Active Options Tracker — O.P.M. Portfolio</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #080c18; color: #c9d4e8; font-family: 'Segoe UI', system-ui, sans-serif; padding: 24px 20px 60px; }
@@ -159,7 +159,7 @@
 <!-- ════ HEADER ════ -->
 <div class="header">
   <div>
-    <h1>⚙️ Active Options Tracker — <span>$120K Mission</span></h1>
+    <h1>⚙️ Active Options Tracker — <span>O.P.M. Portfolio</span></h1>
     <div style="font-size:0.75rem;color:#5a6a8a;margin-top:4px;">Real-time P&amp;L · DTE countdown · Assignment risk monitoring</div>
   </div>
   <div class="nav">
@@ -248,12 +248,6 @@
       <div class="form-group">
         <label>Ticker (Underlying)</label>
         <select id="f-ticker">
-          <option>RKLB</option>
-          <option>TSLA</option>
-          <option>OKLO</option>
-          <option>DKNG</option>
-          <option>WMT</option>
-          <option>SOFI</option>
           <option value="__custom">Other…</option>
         </select>
       </div>
@@ -270,7 +264,7 @@
 
     <div id="custom-ticker-wrap" style="display:none;" class="form-group">
       <label>Custom Ticker</label>
-      <input type="text" id="f-custom-ticker" placeholder="e.g. IONQ" style="text-transform:uppercase;">
+      <input type="text" id="f-custom-ticker" placeholder="e.g. AAPL" style="text-transform:uppercase;">
     </div>
 
     <div class="form-row3">
@@ -302,7 +296,7 @@
     <div class="form-row">
       <div class="form-group">
         <label>Avg Cost / Share ($)</label>
-        <input type="number" id="f-avgcost" step="0.01" placeholder="15.36" title="Your avg cost basis in the underlying">
+        <input type="number" id="f-avgcost" step="0.01" placeholder="e.g. 50.00" title="Your avg cost basis in the underlying">
       </div>
       <div class="form-group">
         <label>Status</label>
@@ -333,10 +327,15 @@
 <script>
 // ── Constants ─────────────────────────────────────────────────────
 const STORAGE_KEY = 'options_positions';
-const AVG_COSTS = {
-  RKLB: 15.36, OKLO: 32.77, TSLA: 224.52,
-  WMT: 79.13, DKNG: 31.94, SOFI: 27.32
-};
+// Auto-fill avg cost when adding a new option position by reading from the
+// user's portfolio (custom_holdings written by portfolio_dashboard.html)
+function loadAvgCosts() {
+  const holdings = JSON.parse(localStorage.getItem('custom_holdings') || '[]');
+  const out = {};
+  holdings.forEach(h => { if (h.ticker && h.avgCost != null) out[h.ticker] = h.avgCost; });
+  return out;
+}
+const AVG_COSTS = loadAvgCosts();
 
 // ── State ─────────────────────────────────────────────────────────
 let apiKey    = localStorage.getItem('finnhub_api_key') || '';
@@ -347,20 +346,29 @@ let livePrices = {};
 function loadPositions() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) return JSON.parse(raw);
-  // Seed with Cycle 1 RKLB
-  return [{
-    id: 'pos_1',
-    ticker: 'RKLB',
-    type: 'covered_call',
-    strike: 75.00,
-    contracts: 5,
-    premium: 4.82,
-    avgCost: 15.36,
-    open: '2026-02-28',
-    expiry: '2026-04-02',
-    status: 'open',
-    notes: 'Cycle 1 — Geopolitical vol play',
-  }];
+  return [];
+}
+
+// Dynamic ticker list — built from custom_holdings
+function getTickerList() {
+  const holdings = JSON.parse(localStorage.getItem('custom_holdings') || '[]');
+  return holdings.map(h => h.ticker).filter(Boolean);
+}
+
+function populateTickerDropdown(selected) {
+  const sel = document.getElementById('f-ticker');
+  if (!sel) return;
+  const tickers = getTickerList();
+  sel.innerHTML = '';
+  tickers.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    if (selected === t) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  const customOpt = document.createElement('option');
+  customOpt.value = '__custom'; customOpt.textContent = 'Other…';
+  sel.appendChild(customOpt);
 }
 function savePositions() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(positions));
@@ -666,12 +674,15 @@ function renderClosedTable(closed) {
 function openAddModal() {
   document.getElementById('modal-title').textContent = 'Add Position';
   document.getElementById('edit-id').value = '';
-  document.getElementById('f-ticker').value    = 'RKLB';
+  const tickers = getTickerList();
+  const defaultTicker = tickers[0] || '';
+  populateTickerDropdown(defaultTicker);
+  if (!tickers.length) document.getElementById('f-ticker').value = '__custom';
   document.getElementById('f-type').value      = 'covered_call';
   document.getElementById('f-strike').value    = '';
-  document.getElementById('f-contracts').value = 5;
+  document.getElementById('f-contracts').value = 1;
   document.getElementById('f-premium').value   = '';
-  document.getElementById('f-avgcost').value   = AVG_COSTS['RKLB'] || '';
+  document.getElementById('f-avgcost').value   = defaultTicker ? (AVG_COSTS[defaultTicker] || '') : '';
   document.getElementById('f-open').value      = todayStr();
   document.getElementById('f-expiry').value    = '';
   document.getElementById('f-status').value    = 'open';
@@ -686,7 +697,10 @@ function openEditModal(id) {
   if (!p) return;
   document.getElementById('modal-title').textContent = 'Edit Position — ' + p.ticker;
   document.getElementById('edit-id').value      = p.id;
-  document.getElementById('f-ticker').value     = ['RKLB','TSLA','OKLO','DKNG','WMT','SOFI'].includes(p.ticker) ? p.ticker : '__custom';
+  const tickers = getTickerList();
+  const isKnown = tickers.includes(p.ticker);
+  populateTickerDropdown(isKnown ? p.ticker : null);
+  document.getElementById('f-ticker').value     = isKnown ? p.ticker : '__custom';
   document.getElementById('f-type').value       = p.type;
   document.getElementById('f-strike').value     = p.strike;
   document.getElementById('f-contracts').value  = p.contracts;
@@ -696,7 +710,7 @@ function openEditModal(id) {
   document.getElementById('f-expiry').value     = p.expiry;
   document.getElementById('f-status').value     = p.status;
   document.getElementById('f-notes').value      = p.notes || '';
-  if (!['RKLB','TSLA','OKLO','DKNG','WMT','SOFI'].includes(p.ticker)) {
+  if (!isKnown) {
     document.getElementById('custom-ticker-wrap').style.display = 'block';
     document.getElementById('f-custom-ticker').value = p.ticker;
   } else {

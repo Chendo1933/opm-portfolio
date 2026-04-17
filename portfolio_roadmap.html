@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>$120K Roadmap — Month by Month</title>
+  <title>Portfolio Roadmap — Month by Month</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -261,8 +261,8 @@
 
 <!-- ── Header ── -->
 <div class="header">
-  <h1>🗺️ <span>$120K Mission</span> — Monthly Roadmap</h1>
-  <p>Feb 28, 2026 → Dec 31, 2026 · Cole Henderson · Starting Value: $81,800</p>
+  <h1>🗺️ <span>O.P.M. Portfolio</span> — Monthly Roadmap</h1>
+  <p>Customize your goal and milestones on the Dashboard · Starting & target values load from your saved settings</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
     <a href="portfolio_dashboard.html" class="nav-link">🏠 Dashboard</a>
     <a href="premium_log.html" class="nav-link">📋 Premium Log</a>
@@ -274,340 +274,192 @@
 </div>
 
 <!-- ── Overall Progress ── -->
-<div class="overall-card">
-  <div class="big-pct">59.4%</div>
-  <div class="big-label">of the way to $120,000 (based on progress from $81,800)</div>
+<div class="overall-card" id="overall-card">
+  <div class="big-pct" id="big-pct">—</div>
+  <div class="big-label" id="big-label">Set your goal on the Dashboard to populate this page</div>
   <div class="progress-track">
-    <div class="progress-fill" style="width:59.4%"></div>
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
   </div>
-  <div class="big-stats">
-    <div class="stat"><div class="v" style="color:#22d3ee">$84,210</div><div class="l">Current Value</div></div>
-    <div class="stat"><div class="v" style="color:#f87171">$35,790</div><div class="l">Remaining Gap</div></div>
-    <div class="stat"><div class="v" style="color:#22c55e">$2,410</div><div class="l">Premium Collected</div></div>
-    <div class="stat"><div class="v" style="color:#f59e0b">10 mo</div><div class="l">Months Remaining</div></div>
-  </div>
+  <div class="big-stats" id="big-stats"></div>
 </div>
 
 <!-- ── Gap Analysis ── -->
-<div class="gap-section">
-  <div class="section-title">How We Close the $35,790 Gap</div>
-  <div class="gap-bar-wrap">
-    <div class="gap-bar-label"><span class="gl">RKLB Premium (9 cycles ~$2,400)</span><span class="gv">~$21,600 &nbsp;(60.4%)</span></div>
-    <div class="gap-track"><div class="gap-fill gf-premium" style="width:60.4%"></div></div>
-  </div>
-  <div class="gap-bar-wrap">
-    <div class="gap-bar-label"><span class="gl">TSLA Premium (6 cycles from Jun ~$2,000)</span><span class="gv">~$12,000 &nbsp;(33.5%)</span></div>
-    <div class="gap-track"><div class="gap-fill gf-premium" style="width:33.5%;background:linear-gradient(90deg,#a855f7,#e879f9)"></div></div>
-  </div>
-  <div class="gap-bar-wrap">
-    <div class="gap-bar-label"><span class="gl">Portfolio Appreciation / Other</span><span class="gv">~$2,190 &nbsp;(6.1%)</span></div>
-    <div class="gap-track"><div class="gap-fill gf-gains" style="width:6.1%"></div></div>
-  </div>
-  <p style="font-size:0.75rem;color:#5a6a8a;margin-top:12px;">
-    Combined premium strategy covers ~93.9% of the gap. Remaining ~6.1% comes from portfolio appreciation + strategic trades.
-  </p>
+<div class="gap-section" id="gap-section">
+  <div class="section-title" id="gap-title">How You Close the Gap</div>
+  <div id="gap-bars"><p style="color:#5a6a8a;font-size:0.8rem;">Log premium cycles on the <a href="premium_log.html" style="color:#22d3ee;">Premium Log</a> page to populate this breakdown.</p></div>
 </div>
 
 <!-- ── Timeline ── -->
-<div class="timeline">
-
-  <!-- FEB (current, partial) -->
-  <div class="month-card achieved">
-    <div class="month-header">
-      <div class="month-name">February 2026</div>
-      <span class="month-badge badge-achieved">✅ In Progress</span>
-    </div>
-    <div class="month-target achieved">$84,210 <span style="font-size:0.9rem;color:#5a6a8a">/ started $81,800</span></div>
-    <div class="month-grid">
-      <div class="month-stat"><div class="ms-label">Gain This Month</div><div class="ms-value green">+$2,410</div></div>
-      <div class="month-stat"><div class="ms-label">Premium Collected</div><div class="ms-value green">$2,410</div></div>
-      <div class="month-stat"><div class="ms-label">Active CC Position</div><div class="ms-value cyan">RKLB 5× $75 Apr 2</div></div>
-      <div class="month-stat"><div class="ms-label">Cash on Hand</div><div class="ms-value amber">$1,569 (SPAXX)</div></div>
-    </div>
-    <div class="month-notes">
-      <strong>Key events:</strong> RKLB Cycle 1 sold — 5× $75 Apr 2 calls at $4.82 = $2,410 collected.
-      Geopolitical risk elevated (US/Israel strikes on Iran Feb 28). RKLB and OKLO may benefit from defense/nuclear tailwinds.
-      $1,500 ready to deploy into DKNG / IONQ.
-    </div>
-  </div>
-
-  <!-- MAR -->
-  <div class="month-card current">
-    <div class="month-header">
-      <div class="month-name">March 2026</div>
-      <span class="month-badge badge-current">🎯 Current Target</span>
-    </div>
-    <div class="month-target current">$86,600</div>
-    <div class="month-grid">
-      <div class="month-stat"><div class="ms-label">Required Gain</div><div class="ms-value amber">+$2,390</div></div>
-      <div class="month-stat"><div class="ms-label">RKLB Check Date</div><div class="ms-value amber">Mar 28</div></div>
-      <div class="month-stat"><div class="ms-label">Deploy $1,500</div><div class="ms-value cyan">DKNG avg down / IONQ</div></div>
-      <div class="month-stat"><div class="ms-label">TSLA Accumulation</div><div class="ms-value cyan">Ongoing → 80 shares</div></div>
-    </div>
-    <div class="month-notes">
-      <strong>Mar 28:</strong> Evaluate RKLB position — roll, close, or let ride to Apr 2 expiration.
-      Watch DKNG for avg-down entry. Consider IONQ and ServiceNow (NOW) with $2K reserve.
-      Reinvest any premium into SPAXX → then redeploy toward TSLA accumulation.
-    </div>
-  </div>
-
-  <!-- APR -->
-  <div class="month-card">
-    <div class="month-header">
-      <div class="month-name">April 2026</div>
-      <span class="month-badge badge-upcoming">Upcoming</span>
-    </div>
-    <div class="month-target upcoming">$91,000</div>
-    <div class="month-grid">
-      <div class="month-stat"><div class="ms-label">Required Gain</div><div class="ms-value">+$4,400</div></div>
-      <div class="month-stat"><div class="ms-label">Apr 2: RKLB Expire</div><div class="ms-value cyan">Cycle 1 closes</div></div>
-      <div class="month-stat"><div class="ms-label">Apr 3+: Cycle 2</div><div class="ms-value green">Sell RKLB calls</div></div>
-      <div class="month-stat"><div class="ms-label">Target Premium</div><div class="ms-value green">~$2,400</div></div>
-    </div>
-    <div class="month-notes">
-      <strong>Apr 2:</strong> RKLB $75 calls expire. If OTM → keep full premium + sell Cycle 2 next day.
-      If ITM → manage or roll. Elevated volatility from geopolitical events may boost Cycle 2 premium above $2,400 baseline.
-      Continue TSLA accumulation.
-    </div>
-  </div>
-
-  <!-- MAY -->
-  <div class="month-card">
-    <div class="month-header">
-      <div class="month-name">May 2026</div>
-      <span class="month-badge badge-upcoming">Upcoming</span>
-    </div>
-    <div class="month-target upcoming">$95,500</div>
-    <div class="month-grid">
-      <div class="month-stat"><div class="ms-label">Required Gain</div><div class="ms-value">+$4,500</div></div>
-      <div class="month-stat"><div class="ms-label">RKLB Cycle 3</div><div class="ms-value green">~$2,400</div></div>
-      <div class="month-stat"><div class="ms-label">TSLA Target Complete</div><div class="ms-value amber">80 shares by end of May</div></div>
-      <div class="month-stat"><div class="ms-label">June Prep</div><div class="ms-value cyan">Ready dual engine</div></div>
-    </div>
-    <div class="month-notes">
-      <strong>Critical milestone:</strong> Complete TSLA accumulation to 100 shares (20 current + 80 more) by end of May.
-      This unlocks covered calls starting June. RKLB Cycle 3 sold. Continue premium reinvestment strategy.
-    </div>
-  </div>
-
-  <!-- JUN — MILESTONE -->
-  <div class="month-card milestone">
-    <div class="month-header">
-      <div class="month-name">June 2026</div>
-      <span class="month-badge badge-milestone">🚀 Dual Engine Milestone</span>
-    </div>
-    <div class="month-target" style="color:#c084fc;">$101,000</div>
-    <div class="month-grid">
-      <div class="month-stat"><div class="ms-label">Required Gain</div><div class="ms-value purple">+$5,500</div></div>
-      <div class="month-stat"><div class="ms-label">RKLB Cycle 4</div><div class="ms-value green">~$2,400</div></div>
-      <div class="month-stat"><div class="ms-label">TSLA Cycle 1 🆕</div><div class="ms-value purple">~$2,000</div></div>
-      <div class="month-stat"><div class="ms-label">Combined Premium</div><div class="ms-value purple">~$4,400/mo</div></div>
-    </div>
-    <div class="month-notes">
-      <strong>🚀 Dual Engine Begins.</strong> TSLA covered calls unlock — first cycle sold.
-      Combined monthly premium target: ~$4,400. First month crossing $100K milestone.
-      This is the turning point — premium income now significantly exceeds monthly gap requirements.
-    </div>
-  </div>
-
-  <!-- JUL -->
-  <div class="month-card">
-    <div class="month-header">
-      <div class="month-name">July 2026</div>
-      <span class="month-badge badge-upcoming">Upcoming</span>
-    </div>
-    <div class="month-target upcoming">$106,000</div>
-    <div class="month-grid">
-      <div class="month-stat"><div class="ms-label">Required Gain</div><div class="ms-value">+$5,000</div></div>
-      <div class="month-stat"><div class="ms-label">RKLB Cycle 5</div><div class="ms-value green">~$2,400</div></div>
-      <div class="month-stat"><div class="ms-label">TSLA Cycle 2</div><div class="ms-value purple">~$2,000</div></div>
-      <div class="month-stat"><div class="ms-label">Combined Premium</div><div class="ms-value cyan">~$4,400</div></div>
-    </div>
-    <div class="month-notes">Full dual-engine month. Both RKLB and TSLA generating premium.
-    Premium alone should be enough to hit monthly target. Portfolio up ~26% from start.</div>
-  </div>
-
-  <!-- AUG — CHECKPOINT -->
-  <div class="month-card milestone">
-    <div class="month-header">
-      <div class="month-name">August 2026</div>
-      <span class="month-badge badge-milestone">📊 Halfway Checkpoint</span>
-    </div>
-    <div class="month-target" style="color:#c084fc;">$110,500</div>
-    <div class="month-grid">
-      <div class="month-stat"><div class="ms-label">Required Gain</div><div class="ms-value purple">+$4,500</div></div>
-      <div class="month-stat"><div class="ms-label">RKLB Cycle 6</div><div class="ms-value green">~$2,400</div></div>
-      <div class="month-stat"><div class="ms-label">TSLA Cycle 3</div><div class="ms-value purple">~$2,000</div></div>
-      <div class="month-stat"><div class="ms-label">% of Goal</div><div class="ms-value cyan">~79.5%</div></div>
-    </div>
-    <div class="month-notes">
-      <strong>Halfway checkpoint.</strong> Assess year-to-date progress against targets.
-      Review DKNG and SOFI positions — have they recovered? Evaluate whether any adjustments to premium strategy are warranted.
-      $9,500 remaining gap with 4 months to go, averaging $2,375/mo needed — well within dual-engine capacity.
-    </div>
-  </div>
-
-  <!-- SEP -->
-  <div class="month-card">
-    <div class="month-header">
-      <div class="month-name">September 2026</div>
-      <span class="month-badge badge-upcoming">Upcoming</span>
-    </div>
-    <div class="month-target upcoming">$114,500</div>
-    <div class="month-grid">
-      <div class="month-stat"><div class="ms-label">Required Gain</div><div class="ms-value">+$4,000</div></div>
-      <div class="month-stat"><div class="ms-label">RKLB Cycle 7</div><div class="ms-value green">~$2,400</div></div>
-      <div class="month-stat"><div class="ms-label">TSLA Cycle 4</div><div class="ms-value purple">~$2,000</div></div>
-      <div class="month-stat"><div class="ms-label">Remaining Gap</div><div class="ms-value amber">$5,500</div></div>
-    </div>
-    <div class="month-notes">Final quarter begins. $5,500 gap with 3 months remaining.
-    At dual-engine rate (~$4,400/mo), this is covered in just over 1 month of premium alone.</div>
-  </div>
-
-  <!-- OCT -->
-  <div class="month-card">
-    <div class="month-header">
-      <div class="month-name">October 2026</div>
-      <span class="month-badge badge-upcoming">Upcoming</span>
-    </div>
-    <div class="month-target upcoming">$117,000</div>
-    <div class="month-grid">
-      <div class="month-stat"><div class="ms-label">Required Gain</div><div class="ms-value">+$2,500</div></div>
-      <div class="month-stat"><div class="ms-label">RKLB Cycle 8</div><div class="ms-value green">~$2,400</div></div>
-      <div class="month-stat"><div class="ms-label">TSLA Cycle 5</div><div class="ms-value purple">~$2,000</div></div>
-      <div class="month-stat"><div class="ms-label">Remaining Gap</div><div class="ms-value amber">$3,000</div></div>
-    </div>
-    <div class="month-notes">In striking distance. $3,000 gap with 2 months to go.
-    RKLB Cycle 8 alone could nearly close the remaining gap. Consider managing risk carefully as goal approaches.</div>
-  </div>
-
-  <!-- NOV -->
-  <div class="month-card">
-    <div class="month-header">
-      <div class="month-name">November 2026</div>
-      <span class="month-badge badge-upcoming">Upcoming</span>
-    </div>
-    <div class="month-target upcoming">$119,000</div>
-    <div class="month-grid">
-      <div class="month-stat"><div class="ms-label">Required Gain</div><div class="ms-value">+$2,000</div></div>
-      <div class="month-stat"><div class="ms-label">RKLB Cycle 9</div><div class="ms-value green">~$2,400</div></div>
-      <div class="month-stat"><div class="ms-label">TSLA Cycle 6</div><div class="ms-value purple">~$2,000</div></div>
-      <div class="month-stat"><div class="ms-label">Remaining Gap</div><div class="ms-value green">~$1,000</div></div>
-    </div>
-    <div class="month-notes">
-      Final month before the finish line. $1,000 gap remaining. RKLB final cycle completes.
-      At this stage, the goal is essentially locked in. Preserve gains and maintain positions through December.
-    </div>
-  </div>
-
-  <!-- DEC — GOAL -->
-  <div class="month-card" style="border-color:#22d3ee;background:#080f18;">
-    <div class="month-header">
-      <div class="month-name">December 2026</div>
-      <span class="month-badge" style="background:#0e3a4a;color:#22d3ee;">🏆 GOAL</span>
-    </div>
-    <div class="month-target goal">$120,000 ✅</div>
-    <div class="month-grid">
-      <div class="month-stat"><div class="ms-label">Total Return</div><div class="ms-value" style="color:#22d3ee;">+46.6%</div></div>
-      <div class="month-stat"><div class="ms-label">Total Premium</div><div class="ms-value green">~$33,600</div></div>
-      <div class="month-stat"><div class="ms-label">RKLB Cycles</div><div class="ms-value">9 complete</div></div>
-      <div class="month-stat"><div class="ms-label">TSLA Cycles</div><div class="ms-value purple">6 complete</div></div>
-    </div>
-    <div class="month-notes" style="color:#22d3ee;">
-      <strong style="color:#22d3ee;">Mission Complete.</strong> $120,000 reached by Dec 31, 2026.
-      Total premium income ~$33,600 closed ~94% of the $38,200 starting gap.
-      Covered call strategy validated. Dual-engine approach from June proved decisive.
-    </div>
-  </div>
-
+<div class="timeline" id="timeline-container">
+  <p style="color:#5a6a8a;font-size:0.8rem;padding:20px;">Set a goal and milestones on the <a href="portfolio_dashboard.html" style="color:#22d3ee;">Dashboard</a> to generate your month-by-month roadmap.</p>
 </div>
+
 
 <!-- ── Cycle Log ── -->
-<div class="premium-section" style="margin-top:28px;">
+<div class="premium-section" style="margin-top:28px;" id="cycle-log-section">
   <div class="section-title">Premium Cycle Log</div>
-  <table class="cycle-table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Ticker</th>
-        <th>Strike</th>
-        <th>Expiration</th>
-        <th>Contracts</th>
-        <th class="align-right">Premium/Share</th>
-        <th class="align-right">Total Collected</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="cycle-done">1</td>
-        <td><strong style="color:#fff">RKLB</strong></td>
-        <td>$75.00</td>
-        <td>Apr 2, 2026</td>
-        <td>5×</td>
-        <td class="align-right cycle-done">$4.82</td>
-        <td class="align-right cycle-done">$2,410</td>
-        <td><span style="background:#14532d;color:#86efac;font-size:0.68rem;padding:2px 7px;border-radius:4px;font-weight:700;">ACTIVE</span></td>
-      </tr>
-      <tr>
-        <td class="cycle-pending">2</td>
-        <td><strong style="color:#fff">RKLB</strong></td>
-        <td>TBD</td>
-        <td>~Apr/May 2026</td>
-        <td>5×</td>
-        <td class="align-right cycle-pending">~$4.80</td>
-        <td class="align-right cycle-pending">~$2,400</td>
-        <td><span style="background:#1a2040;color:#5a6a8a;font-size:0.68rem;padding:2px 7px;border-radius:4px;">PENDING</span></td>
-      </tr>
-      <tr>
-        <td class="cycle-pending">3</td>
-        <td><strong style="color:#fff">RKLB</strong></td>
-        <td>TBD</td>
-        <td>~May/Jun 2026</td>
-        <td>5×</td>
-        <td class="align-right cycle-pending">~$4.80</td>
-        <td class="align-right cycle-pending">~$2,400</td>
-        <td><span style="background:#1a2040;color:#5a6a8a;font-size:0.68rem;padding:2px 7px;border-radius:4px;">PENDING</span></td>
-      </tr>
-      <tr>
-        <td class="cycle-pending">4</td>
-        <td><strong style="color:#fff">RKLB</strong></td>
-        <td>TBD</td>
-        <td>~Jun 2026</td>
-        <td>5×</td>
-        <td class="align-right cycle-pending">~$4.80</td>
-        <td class="align-right cycle-pending">~$2,400</td>
-        <td><span style="background:#1a2040;color:#5a6a8a;font-size:0.68rem;padding:2px 7px;border-radius:4px;">PENDING</span></td>
-      </tr>
-      <tr>
-        <td class="cycle-pending">T1</td>
-        <td><strong style="color:#c084fc">TSLA</strong></td>
-        <td>TBD</td>
-        <td>~Jun 2026</td>
-        <td>1×</td>
-        <td class="align-right cycle-pending">~$20.00</td>
-        <td class="align-right cycle-pending">~$2,000</td>
-        <td><span style="background:#2a1040;color:#c084fc;font-size:0.68rem;padding:2px 7px;border-radius:4px;">🔒 LOCKED</span></td>
-      </tr>
-      <tr>
-        <td colspan="6" style="color:#3a4a6a;font-style:italic;font-size:0.75rem;padding:10px;">+ 5 more RKLB cycles + 5 more TSLA cycles (Jul–Dec)</td>
-        <td class="align-right" style="color:#22d3ee;font-weight:700;">~$28,790</td>
-        <td></td>
-      </tr>
-    </tbody>
-    <tfoot>
-      <tr>
-        <td colspan="6" style="color:#fff;font-weight:700;border-top:1px solid #2a3560;padding-top:10px;">Total Projected Premium</td>
-        <td class="align-right" style="color:#22d3ee;font-weight:700;border-top:1px solid #2a3560;padding-top:10px;">~$33,600</td>
-        <td style="border-top:1px solid #2a3560;"></td>
-      </tr>
-    </tfoot>
-  </table>
+  <div id="cycle-log-content"><p style="color:#5a6a8a;font-size:0.8rem;">Log your covered call cycles on the <a href="premium_log.html" style="color:#22d3ee;">Premium Log</a> page — they'll appear here.</p></div>
 </div>
 
+
 <div class="footer-note">
-  $120K Roadmap · Cole Henderson · Built with Claude · Not financial advice
+  O.P.M. Portfolio Roadmap · Built with Claude · Not financial advice
 </div>
+
+<script>
+(function () {
+  const fmt$ = v => '$' + Math.round(v).toLocaleString();
+  const _gs = JSON.parse(localStorage.getItem('goal_settings') || 'null');
+  const GOAL        = _gs ? _gs.goal       : 120000;
+  const START_VALUE = _gs ? _gs.startValue : 0;
+  const GOAL_DATE   = _gs ? new Date(_gs.goalDate) : new Date('2026-12-31T23:59:59');
+
+  const hist     = JSON.parse(localStorage.getItem('portfolio_value_history') || '[]');
+  const latest   = hist.length ? hist[hist.length - 1].value : START_VALUE;
+  const cycles   = JSON.parse(localStorage.getItem('premium_cycles') || '[]');
+  const mstonesA = JSON.parse(localStorage.getItem('custom_milestones') || '[]');
+
+  // ── Overall progress ─────────────────────────────────────────────
+  const gainRange = Math.max(1, GOAL - START_VALUE);
+  const pctDone   = Math.max(0, Math.min(100, ((latest - START_VALUE) / gainRange) * 100));
+  const gap       = Math.max(0, GOAL - latest);
+  const now       = new Date();
+  const monthsLeft= Math.max(0, Math.ceil((GOAL_DATE - now) / (1000 * 60 * 60 * 24 * 30)));
+  const premTotal = cycles.reduce((a,c) => a + (c.premium||0)*(c.contracts||0)*100, 0);
+
+  if (_gs) {
+    document.getElementById('big-pct').textContent = pctDone.toFixed(1) + '%';
+    document.getElementById('big-label').textContent =
+      'of the way to ' + fmt$(GOAL) + ' (based on progress from ' + fmt$(START_VALUE) + ')';
+    document.getElementById('progress-fill').style.width = pctDone + '%';
+    document.getElementById('big-stats').innerHTML = [
+      '<div class="stat"><div class="v" style="color:#22d3ee">'+fmt$(latest)+'</div><div class="l">Current Value</div></div>',
+      '<div class="stat"><div class="v" style="color:#f87171">'+fmt$(gap)+'</div><div class="l">Remaining Gap</div></div>',
+      '<div class="stat"><div class="v" style="color:#22c55e">'+fmt$(premTotal)+'</div><div class="l">Premium Collected</div></div>',
+      '<div class="stat"><div class="v" style="color:#f59e0b">'+monthsLeft+' mo</div><div class="l">Months Remaining</div></div>',
+    ].join('');
+  }
+
+  // ── Gap analysis (per-ticker premium breakdown) ──────────────────
+  if (cycles.length) {
+    const byTicker = {};
+    cycles.forEach(c => {
+      const t = (c.premium || 0) * (c.contracts || 0) * 100;
+      byTicker[c.ticker || 'Unknown'] = (byTicker[c.ticker || 'Unknown'] || 0) + t;
+    });
+    const gapBase = Math.max(1, gap + premTotal); // original gap baseline
+    const rows = Object.entries(byTicker).sort((a,b) => b[1] - a[1]).map(([tk, v], i) => {
+      const pct = (v / gapBase) * 100;
+      const colors = [
+        'linear-gradient(90deg,#0ea5e9,#22d3ee)',
+        'linear-gradient(90deg,#a855f7,#e879f9)',
+        'linear-gradient(90deg,#22c55e,#86efac)',
+        'linear-gradient(90deg,#f59e0b,#fbbf24)',
+        'linear-gradient(90deg,#f87171,#fca5a5)',
+      ];
+      return `<div class="gap-bar-wrap">
+        <div class="gap-bar-label"><span class="gl">${tk} Premium collected</span><span class="gv">${fmt$(v)} &nbsp;(${pct.toFixed(1)}%)</span></div>
+        <div class="gap-track"><div class="gap-fill" style="width:${Math.min(100,pct)}%;background:${colors[i % colors.length]}"></div></div>
+      </div>`;
+    }).join('');
+    document.getElementById('gap-title').textContent = 'How You Close the ' + fmt$(gap + premTotal) + ' Starting Gap';
+    document.getElementById('gap-bars').innerHTML = rows +
+      `<p style="font-size:0.75rem;color:#5a6a8a;margin-top:12px;">Premium collected to date: ${fmt$(premTotal)} · Remaining: ${fmt$(gap)}.</p>`;
+  }
+
+  // ── Dynamic timeline from milestones ─────────────────────────────
+  if (_gs && mstonesA.length) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const currentMonth = now.getMonth() + 1;
+    const goalMonth    = GOAL_DATE.getMonth() + 1;
+    const goalYear     = GOAL_DATE.getFullYear();
+
+    let html = '';
+    // Sort milestones by month
+    const sorted = [...mstonesA].sort((a,b) => (a.month||0) - (b.month||0));
+    sorted.forEach(m => {
+      const achieved = m.month < currentMonth && latest >= m.value;
+      const current  = m.month === currentMonth;
+      let cls = 'month-card';
+      let badge = '<span class="month-badge badge-upcoming">Upcoming</span>';
+      let tgtCls = 'upcoming';
+      if (achieved) { cls += ' achieved'; badge = '<span class="month-badge badge-achieved">✅ Achieved</span>'; tgtCls = 'achieved'; }
+      else if (current) { cls += ' current'; badge = '<span class="month-badge badge-current">🎯 Current</span>'; tgtCls = 'current'; }
+      const mName = monthNames[(m.month - 1) % 12] + ' ' + goalYear;
+      const required = Math.max(0, m.value - (sorted.find(x => x.month === m.month - 1)?.value || START_VALUE));
+      html += `<div class="${cls}">
+        <div class="month-header">
+          <div class="month-name">${mName}</div>
+          ${badge}
+        </div>
+        <div class="month-target ${tgtCls}">${fmt$(m.value)}</div>
+        <div class="month-grid">
+          <div class="month-stat"><div class="ms-label">Target</div><div class="ms-value">${fmt$(m.value)}</div></div>
+          <div class="month-stat"><div class="ms-label">Required Gain</div><div class="ms-value amber">+${fmt$(required)}</div></div>
+          <div class="month-stat"><div class="ms-label">% of Goal</div><div class="ms-value cyan">${(m.value/GOAL*100).toFixed(1)}%</div></div>
+        </div>
+      </div>`;
+    });
+    // Goal card
+    html += `<div class="month-card" style="border-color:#22d3ee;background:#080f18;">
+      <div class="month-header">
+        <div class="month-name">${monthNames[goalMonth-1]} ${goalYear}</div>
+        <span class="month-badge" style="background:#0e3a4a;color:#22d3ee;">🏆 GOAL</span>
+      </div>
+      <div class="month-target goal">${fmt$(GOAL)} ✅</div>
+      <div class="month-grid">
+        <div class="month-stat"><div class="ms-label">Total Target</div><div class="ms-value" style="color:#22d3ee;">${fmt$(GOAL)}</div></div>
+        <div class="month-stat"><div class="ms-label">Return</div><div class="ms-value green">+${((GOAL-START_VALUE)/Math.max(1,START_VALUE)*100).toFixed(1)}%</div></div>
+      </div>
+    </div>`;
+    document.getElementById('timeline-container').innerHTML = html;
+  }
+
+  // ── Cycle Log ────────────────────────────────────────────────────
+  if (cycles.length) {
+    const rows = cycles.slice().reverse().map((c, i) => {
+      const total = (c.premium||0) * (c.contracts||0) * 100;
+      const statusColor = c.outcome === 'expired_otm' ? '#86efac'
+                        : c.outcome === 'assigned'   ? '#fca5a5'
+                        : c.outcome === 'rolled'     ? '#fcd34d'
+                        : '#5a6a8a';
+      const statusBg    = c.outcome === 'expired_otm' ? '#14532d'
+                        : c.outcome === 'assigned'   ? '#581818'
+                        : c.outcome === 'rolled'     ? '#78350f'
+                        : '#1a2040';
+      const label = (c.outcome || 'ACTIVE').replace(/_/g,' ').toUpperCase();
+      return `<tr>
+        <td class="cycle-done">${cycles.length - i}</td>
+        <td><strong style="color:#fff">${c.ticker||'—'}</strong></td>
+        <td>$${(c.strike||0).toFixed(2)}</td>
+        <td>${c.expiry || '—'}</td>
+        <td>${c.contracts||0}×</td>
+        <td class="align-right cycle-done">$${(c.premium||0).toFixed(2)}</td>
+        <td class="align-right cycle-done">$${total.toLocaleString()}</td>
+        <td><span style="background:${statusBg};color:${statusColor};font-size:0.68rem;padding:2px 7px;border-radius:4px;font-weight:700;">${label}</span></td>
+      </tr>`;
+    }).join('');
+    document.getElementById('cycle-log-content').innerHTML = `
+      <table class="cycle-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Ticker</th><th>Strike</th><th>Expiration</th><th>Contracts</th>
+            <th class="align-right">Premium/Share</th><th class="align-right">Total</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+        <tfoot>
+          <tr>
+            <td colspan="6" style="color:#fff;font-weight:700;border-top:1px solid #2a3560;padding-top:10px;">Total Premium Collected</td>
+            <td class="align-right" style="color:#22d3ee;font-weight:700;border-top:1px solid #2a3560;padding-top:10px;">${fmt$(premTotal)}</td>
+            <td style="border-top:1px solid #2a3560;"></td>
+          </tr>
+        </tfoot>
+      </table>`;
+  }
+})();
+</script>
 
 </body>
 </html>

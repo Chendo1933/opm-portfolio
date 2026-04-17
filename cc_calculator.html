@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CC Calculator — $120K Mission</title>
+  <title>CC Calculator — O.P.M. Portfolio</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #080c18; color: #c9d4e8; font-family: 'Segoe UI', system-ui, sans-serif; padding: 24px 20px 48px; }
@@ -78,7 +78,7 @@
 <body>
 
 <div class="header">
-  <h1>🧮 Covered Call Calculator — <span>$120K Mission</span></h1>
+  <h1>🧮 Covered Call Calculator — <span>O.P.M. Portfolio</span></h1>
   <div class="nav">
     <a href="portfolio_dashboard.html">🏠 Dashboard</a>
     <a href="premium_log.html">📋 Premium Log</a>
@@ -101,9 +101,9 @@
 <!-- Preset buttons -->
 <div class="presets">
   <span style="font-size:0.78rem;color:#5a6a8a;align-self:center;">Quick load:</span>
-  <button class="preset-btn active" onclick="loadPreset('rklb_c1')">RKLB Cycle 1 (active)</button>
-  <button class="preset-btn" onclick="loadPreset('rklb_c2')">RKLB Cycle 2 (model)</button>
-  <button class="preset-btn" onclick="loadPreset('tsla')">TSLA (Jun unlock model)</button>
+  <button class="preset-btn active" onclick="loadPreset('low_cost')">Low-cost stock (example)</button>
+  <button class="preset-btn" onclick="loadPreset('mid_cost')">Mid-cost stock (example)</button>
+  <button class="preset-btn" onclick="loadPreset('high_cost')">High-cost stock (example)</button>
   <button class="preset-btn" onclick="loadPreset('custom')">Custom</button>
 </div>
 
@@ -114,20 +114,20 @@
     <div class="section-title">Position Inputs</div>
     <div class="form-group">
       <label>Ticker</label>
-      <input type="text" id="f-ticker" value="RKLB" onblur="fetchAndApplyPrice()">
+      <input type="text" id="f-ticker" placeholder="e.g. AAPL" onblur="fetchAndApplyPrice()">
     </div>
     <div class="form-row">
       <div class="form-group">
         <label>Stock Price ($)</label>
         <div style="display:flex;gap:6px;align-items:center;">
-          <input type="number" id="f-stock-price" step="0.01" value="15.36" style="flex:1;">
+          <input type="number" id="f-stock-price" step="0.01" placeholder="15.00" style="flex:1;">
           <button onclick="fetchAndApplyPrice()" title="Fetch live price" style="background:#1e2744;border:1px solid #2a3560;color:#22d3ee;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:0.75rem;white-space:nowrap;">↻ Live</button>
         </div>
         <div class="input-hint">Current market price — auto-filled on preset load</div>
       </div>
       <div class="form-group">
         <label>Avg Cost ($)</label>
-        <input type="number" id="f-avg-cost" step="0.01" value="15.36">
+        <input type="number" id="f-avg-cost" step="0.01" placeholder="15.00">
         <div class="input-hint">Your cost basis</div>
       </div>
     </div>
@@ -154,7 +154,7 @@
     </div>
     <div class="form-group">
       <label>Shares Owned</label>
-      <input type="number" id="f-shares" step="0.001" value="577.337">
+      <input type="number" id="f-shares" step="0.001" placeholder="500">
     </div>
     <button class="calc-btn" onclick="calculate()">Calculate →</button>
   </div>
@@ -164,12 +164,12 @@
 
     <!-- Key metrics -->
     <div class="result-cards">
-      <div class="rc"><div class="rl">Total Premium</div><div class="rv green" id="r-total-premium">$2,410</div><div class="rs">$4.82 × 500 shares</div></div>
-      <div class="rc"><div class="rl">Annualized Return</div><div class="rv cyan" id="r-ann-return">53.3%</div><div class="rs">On premium vs stock price</div></div>
-      <div class="rc"><div class="rl">Break-Even (downside)</div><div class="rv amber" id="r-breakeven">$10.54</div><div class="rs">Stock price – premium</div></div>
-      <div class="rc"><div class="rl">Max Profit</div><div class="rv green" id="r-max-profit">$32,410</div><div class="rs">If called away at strike</div></div>
-      <div class="rc"><div class="rl">Premium / Stock %</div><div class="rv cyan" id="r-prem-pct">31.4%</div><div class="rs">Premium as % of stock price</div></div>
-      <div class="rc"><div class="rl">Strike vs Cost</div><div class="rv purple" id="r-strike-vs-cost">+388%</div><div class="rs">Strike premium over avg cost</div></div>
+      <div class="rc"><div class="rl">Total Premium</div><div class="rv green" id="r-total-premium">—</div><div class="rs">premium × contracts × 100</div></div>
+      <div class="rc"><div class="rl">Annualized Return</div><div class="rv cyan" id="r-ann-return">—</div><div class="rs">On premium vs stock price</div></div>
+      <div class="rc"><div class="rl">Break-Even (downside)</div><div class="rv amber" id="r-breakeven">—</div><div class="rs">Stock price – premium</div></div>
+      <div class="rc"><div class="rl">Max Profit</div><div class="rv green" id="r-max-profit">—</div><div class="rs">If called away at strike</div></div>
+      <div class="rc"><div class="rl">Premium / Stock %</div><div class="rv cyan" id="r-prem-pct">—</div><div class="rs">Premium as % of stock price</div></div>
+      <div class="rc"><div class="rl">Strike vs Cost</div><div class="rv purple" id="r-strike-vs-cost">—</div><div class="rs">Strike premium over avg cost</div></div>
     </div>
 
     <!-- P&L Chart -->
@@ -204,12 +204,12 @@
     <!-- vs Strategy comparison -->
     <div class="comparison">
       <div class="section-title">Strategy Comparison</div>
-      <div class="comp-row"><span class="comp-label">Premium collected this cycle</span><span class="comp-value green" id="cmp-premium">$2,410</span></div>
-      <div class="comp-row"><span class="comp-label">Annual cycles at this rate (9)</span><span class="comp-value cyan" id="cmp-annual">$21,690</span></div>
-      <div class="comp-row"><span class="comp-label">Stock must rise to match (no calls)</span><span class="comp-value amber" id="cmp-rise-needed">+31.4%</span></div>
-      <div class="comp-row"><span class="comp-label">Income generated in 33 days</span><span class="comp-value green" id="cmp-period">$2,410</span></div>
-      <div class="comp-row"><span class="comp-label">Cap on upside (called away if ></span><span class="comp-value" id="cmp-cap">$75.00)</span></div>
-      <div class="comp-row"><span class="comp-label">Called-away scenario gain</span><span class="comp-value green" id="cmp-called">+$32,410</span></div>
+      <div class="comp-row"><span class="comp-label">Premium collected this cycle</span><span class="comp-value green" id="cmp-premium">—</span></div>
+      <div class="comp-row"><span class="comp-label">Annual cycles at this rate (9)</span><span class="comp-value cyan" id="cmp-annual">—</span></div>
+      <div class="comp-row"><span class="comp-label">Stock must rise to match (no calls)</span><span class="comp-value amber" id="cmp-rise-needed">—</span></div>
+      <div class="comp-row"><span class="comp-label">Income generated</span><span class="comp-value green" id="cmp-period">—</span></div>
+      <div class="comp-row"><span class="comp-label">Cap on upside (called away if ></span><span class="comp-value" id="cmp-cap">—</span></div>
+      <div class="comp-row"><span class="comp-label">Called-away scenario gain</span><span class="comp-value green" id="cmp-called">—</span></div>
     </div>
 
   </div>
@@ -253,16 +253,24 @@ async function fetchAndApplyPrice() {
   }
 }
 
-const presets = {
-  rklb_c1: { ticker:'RKLB', stockPrice:15.36, avgCost:15.36, strike:75, contracts:5, premium:4.82, dte:33, shares:577.337 },
-  rklb_c2: { ticker:'RKLB', stockPrice:15.36, avgCost:15.36, strike:75, contracts:5, premium:4.80, dte:35, shares:577.337 },
-  tsla:    { ticker:'TSLA', stockPrice:182.87, avgCost:182.87, strike:220, contracts:1, premium:20.00, dte:35, shares:100 },
-  custom:  { ticker:'', stockPrice:'', avgCost:'', strike:'', contracts:1, premium:'', dte:30, shares:'' },
+// Generic example presets — edit or add your own in localStorage key 'cc_calc_presets'
+const DEFAULT_PRESETS = {
+  low_cost:  { ticker:'',  stockPrice:15,  avgCost:15,  strike:20,  contracts:5, premium:0.75, dte:30, shares:500 },
+  mid_cost:  { ticker:'',  stockPrice:50,  avgCost:50,  strike:60,  contracts:2, premium:1.50, dte:30, shares:200 },
+  high_cost: { ticker:'',  stockPrice:200, avgCost:200, strike:230, contracts:1, premium:4.00, dte:30, shares:100 },
+  custom:    { ticker:'',  stockPrice:'',  avgCost:'',  strike:'',  contracts:1, premium:'',   dte:30, shares:'' },
 };
+const presets = Object.assign({}, DEFAULT_PRESETS, JSON.parse(localStorage.getItem('cc_calc_presets') || '{}'));
 
 function loadPreset(key) {
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  if (typeof event !== 'undefined' && event && event.target) {
+    event.target.classList.add('active');
+  } else {
+    // Programmatic load — mark the matching button
+    const btn = document.querySelector('.preset-btn[onclick*="\'' + key + '\'"]');
+    if (btn) btn.classList.add('active');
+  }
   const p = presets[key];
   document.getElementById('f-ticker').value      = p.ticker;
   document.getElementById('f-stock-price').value = p.stockPrice || '';
@@ -455,8 +463,8 @@ function drawChart(stockPrice, avgCost, strike, premium, contracts, dte) {
   ctx.fillText('Now', xCur + 6, yPos(ccPnl[Math.round((stockPrice - minPrice) / (maxPrice - minPrice) * steps)]) + 4);
 }
 
-// Init — fetch live price for default RKLB preset on load
-fetchAndApplyPrice();
+// Init — load the first example preset on page load
+loadPreset('low_cost');
 window.addEventListener('resize', calculate);
 </script>
 </body>

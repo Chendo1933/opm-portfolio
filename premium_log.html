@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Premium Cycle Log — $120K Mission</title>
+  <title>Premium Cycle Log — O.P.M. Portfolio</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #080c18; color: #c9d4e8; font-family: 'Segoe UI', system-ui, sans-serif; padding: 24px 20px 48px; }
@@ -97,7 +97,7 @@
 <body>
 
 <div class="header">
-  <h1>📋 Premium Cycle Log — <span>$120K Mission</span></h1>
+  <h1>📋 Premium Cycle Log — <span>O.P.M. Portfolio</span></h1>
   <div class="nav">
     <a href="portfolio_dashboard.html">🏠 Dashboard</a>
     <a href="deployment_planner.html">💡 Investments</a>
@@ -110,40 +110,21 @@
 
 <!-- Summary Cards -->
 <div class="cards">
-  <div class="card"><div class="label">Total Collected</div><div class="value green" id="total-collected">$2,410</div><div class="sub">Running total</div></div>
-  <div class="card"><div class="label">Cycles Complete</div><div class="value cyan" id="cycles-complete">0</div><div class="sub">of 15 planned</div></div>
-  <div class="card"><div class="label">Active Positions</div><div class="value amber" id="active-count">1</div><div class="sub">Open right now</div></div>
-  <div class="card"><div class="label">Avg Per Cycle</div><div class="value" id="avg-cycle" style="color:#c9d4e8;">$2,410</div><div class="sub">Collected only</div></div>
-  <div class="card"><div class="label">Projected Total</div><div class="value cyan">~$33,600</div><div class="sub">9 RKLB + 6 TSLA</div></div>
-  <div class="card"><div class="label">Gap Coverage</div><div class="value green" id="gap-coverage">6.7%</div><div class="sub">of $35,790 gap</div></div>
+  <div class="card"><div class="label">Total Collected</div><div class="value green" id="total-collected">$0</div><div class="sub">Running total</div></div>
+  <div class="card"><div class="label">Cycles Complete</div><div class="value cyan" id="cycles-complete">0</div><div class="sub">Closed & settled</div></div>
+  <div class="card"><div class="label">Active Positions</div><div class="value amber" id="active-count">0</div><div class="sub">Open right now</div></div>
+  <div class="card"><div class="label">Avg Per Cycle</div><div class="value" id="avg-cycle" style="color:#c9d4e8;">$0</div><div class="sub">Collected only</div></div>
+  <div class="card"><div class="label">Projected Total</div><div class="value cyan" id="projected-total">—</div><div class="sub">Sum of per-ticker targets</div></div>
+  <div class="card"><div class="label">Gap Coverage</div><div class="value green" id="gap-coverage">—</div><div class="sub" id="gap-sub">of portfolio gap</div></div>
 </div>
 
-<!-- Progress Bars -->
+<!-- Progress Bars (dynamic per ticker) -->
 <div class="progress-section">
   <div class="section-title">Premium Engine Progress</div>
-  <div style="margin-bottom:14px;">
-    <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:5px;">
-      <span style="color:#22d3ee;">RKLB — 9 cycles</span>
-      <span id="rklb-progress-label" style="color:#22d3ee;">$2,410 / $21,600 collected</span>
+  <div id="premium-progress-container">
+    <div style="color:#5a6a8a;font-size:0.82rem;font-style:italic;padding:8px 0;">
+      Log covered call cycles below to see per-ticker progress bars here.
     </div>
-    <div class="prog-track"><div class="prog-fill prog-rklb" id="rklb-bar" style="width:11.2%"></div></div>
-    <div class="prog-labels"><span>$0</span><span>$21,600</span></div>
-  </div>
-  <div style="margin-bottom:14px;">
-    <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:5px;">
-      <span style="color:#f59e0b;">OKLO — 2 contracts × ~9 cycles ✅ Ready</span>
-      <span id="oklo-progress-label" style="color:#f59e0b;">$0 / $3,600 collected</span>
-    </div>
-    <div class="prog-track"><div class="prog-fill" style="width:0%;background:linear-gradient(90deg,#d97706,#f59e0b);border-radius:999px;height:100%;transition:width .5s ease;" id="oklo-bar"></div></div>
-    <div class="prog-labels"><span>$0</span><span>$3,600</span></div>
-  </div>
-  <div>
-    <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:5px;">
-      <span style="color:#c084fc;">DKNG — 3 contracts × ~9 cycles ✅ Ready (far OTM)</span>
-      <span id="dkng-progress-label" style="color:#c084fc;">$0 / $3,600 collected</span>
-    </div>
-    <div class="prog-track"><div class="prog-fill prog-tsla" id="tsla-bar" style="width:0%"></div></div>
-    <div class="prog-labels"><span>$0</span><span>$3,600</span></div>
   </div>
 </div>
 
@@ -153,9 +134,8 @@
   <canvas id="cumulative-canvas"></canvas>
   <div class="chart-legend">
     <span><span class="legend-dot" style="background:#22c55e;display:inline-block;height:3px;"></span><span style="color:#22c55e;">Actual collected</span></span>
-    <span><span class="legend-dot" style="background:#3a4a6a;display:inline-block;height:3px;border-top:2px dashed #3a4a6a;"></span><span style="color:#3a4a6a;">Target pace ($33,600 by Dec 31)</span></span>
-    <span><span class="legend-dot" style="background:#22d3ee;display:inline-block;"></span><span style="color:#22d3ee;">RKLB goal $21,600</span></span>
-    <span><span class="legend-dot" style="background:#c084fc;display:inline-block;"></span><span style="color:#c084fc;">Combined goal $33,600</span></span>
+    <span><span class="legend-dot" style="background:#3a4a6a;display:inline-block;height:3px;border-top:2px dashed #3a4a6a;"></span><span style="color:#3a4a6a;">Target pace (sum of per-ticker goals)</span></span>
+    <span><span class="legend-dot" style="background:#c084fc;display:inline-block;"></span><span style="color:#c084fc;">Total goal line</span></span>
   </div>
 </div>
 
@@ -198,11 +178,11 @@
 <!-- Annual Pace -->
 <div class="pace-section">
   <div class="section-title">Pace Analysis</div>
-  <div class="pace-row"><span class="pace-label">Cycles logged (incl. active)</span><span class="pace-value" id="pace-logged">1</span></div>
+  <div class="pace-row"><span class="pace-label">Cycles logged (incl. active)</span><span class="pace-value" id="pace-logged">0</span></div>
   <div class="pace-row"><span class="pace-label">Average premium per completed cycle</span><span class="pace-value" id="pace-avg">—</span></div>
-  <div class="pace-row"><span class="pace-label">Remaining RKLB cycles needed</span><span class="pace-value" id="pace-remaining-rklb">8</span></div>
-  <div class="pace-row"><span class="pace-label">Projected RKLB total at current avg</span><span class="pace-value" id="pace-proj-rklb">—</span></div>
-  <div class="pace-row"><span class="pace-label">Combined total (RKLB proj + TSLA $12K)</span><span class="pace-value" id="pace-combined">—</span></div>
+  <div class="pace-row"><span class="pace-label">Remaining cycles needed</span><span class="pace-value" id="pace-remaining-rklb">—</span></div>
+  <div class="pace-row"><span class="pace-label">Projected total at current avg</span><span class="pace-value" id="pace-proj-rklb">—</span></div>
+  <div class="pace-row"><span class="pace-label">Combined projected total</span><span class="pace-value" id="pace-combined">—</span></div>
   <div class="pace-row"><span class="pace-label">On track to close gap?</span><span class="pace-value" id="pace-ontrack">—</span></div>
 </div>
 
@@ -214,10 +194,7 @@
     <div class="form-row">
       <div class="form-group">
         <label>Ticker</label>
-        <select id="f-ticker">
-          <option value="RKLB">RKLB</option>
-          <option value="TSLA">TSLA</option>
-        </select>
+        <select id="f-ticker"></select>
       </div>
       <div class="form-group">
         <label>Contracts</label>
@@ -268,18 +245,32 @@
 
 <script>
 // ── Data ────────────────────────────────────────────────────────────
-const RKLB_TARGET  = 21600;
-const OKLO_TARGET  = 3600;
-const DKNG_TARGET  = 3600;
-const OTHER_TARGET = OKLO_TARGET + DKNG_TARGET;  // 7200 combined
-const GAP          = 35790;
-const RKLB_CYCLES  = 9;
-const OTHER_CYCLES = 9;
+// Per-ticker premium targets are user-configurable via localStorage key
+// 'cc_targets'. Shape: { RKLB: 21600, OKLO: 3600, ... }
+// If missing, we infer a sensible default from logged cycles.
+function loadCcTargets() {
+  return JSON.parse(localStorage.getItem('cc_targets') || '{}');
+}
+function saveCcTargets(targets) {
+  localStorage.setItem('cc_targets', JSON.stringify(targets));
+}
 
-const defaultCycles = [
-  { ticker: 'RKLB', contracts: 5, strike: 75.00, premium: 4.82,
-    open: '2026-02-28', expiry: '2026-04-02', outcome: 'active', notes: '' }
-];
+// Gap = goal − current portfolio value, from dashboard's goal_settings + latest history
+function loadGap() {
+  const gs = JSON.parse(localStorage.getItem('goal_settings') || 'null');
+  const goal  = gs ? gs.goal       : 120000;
+  const start = gs ? gs.startValue : 0;
+  const hist  = JSON.parse(localStorage.getItem('portfolio_value_history') || '[]');
+  const latest = hist.length ? hist[hist.length - 1].value : start;
+  return Math.max(goal - latest, 0);
+}
+
+// Default cycle count used when guessing a target from just one logged cycle
+const DEFAULT_CYCLES = 9;
+
+// Empty by default — users add cycles as they sell covered calls.
+// Shape: { ticker, contracts, strike, premium (per-share $), open, expiry, outcome: 'active'|'otm'|'rolled'|'itm', notes }
+const defaultCycles = [];
 
 function load() {
   const saved = localStorage.getItem('premium_cycles');
@@ -302,7 +293,7 @@ function render() {
   let completedSum   = 0;
   let rklbCollected  = 0;
   let okloCollected  = 0;
-  let dkngCollected  = 0;
+  const perTicker    = {}; // { TICKER: { collected, count } }
 
   const outcomeLabels = {
     active: '<span class="badge badge-active">🟢 Active</span>',
@@ -316,9 +307,9 @@ function render() {
     totalCollected += total;
     if (c.outcome === 'active') activeCount++;
     else { completedCount++; completedSum += total; }
-    if (c.ticker === 'RKLB')      rklbCollected += total;
-    else if (c.ticker === 'OKLO') okloCollected += total;
-    else if (c.ticker === 'DKNG') dkngCollected += total;
+    if (!perTicker[c.ticker]) perTicker[c.ticker] = { collected: 0, count: 0 };
+    perTicker[c.ticker].collected += total;
+    perTicker[c.ticker].count += 1;
 
     tbody.innerHTML += `
       <tr>
@@ -338,6 +329,23 @@ function render() {
   // Footer
   document.getElementById('foot-total').textContent = '$' + totalCollected.toLocaleString();
 
+  // Compute per-ticker targets (user-set, else inferred)
+  const ccTargets = loadCcTargets();
+  const resolvedTargets = {};
+  let projectedTotal = 0;
+  Object.keys(perTicker).forEach(t => {
+    let target = ccTargets[t];
+    if (!target) {
+      const avg = perTicker[t].count > 0 ? perTicker[t].collected / perTicker[t].count : 0;
+      target = Math.round(avg * DEFAULT_CYCLES) || Math.max(perTicker[t].collected * 2, 1000);
+    }
+    resolvedTargets[t] = target;
+    projectedTotal += target;
+  });
+
+  // Gap coverage based on live portfolio gap
+  const gap = loadGap();
+
   // Cards
   document.getElementById('total-collected').textContent = '$' + totalCollected.toLocaleString();
   document.getElementById('cycles-complete').textContent = completedCount;
@@ -345,41 +353,61 @@ function render() {
   document.getElementById('avg-cycle').textContent       = completedCount > 0
     ? '$' + Math.round(completedSum / completedCount).toLocaleString()
     : '$' + (totalCollected || 0).toLocaleString();
-  document.getElementById('gap-coverage').textContent =
-    ((totalCollected / GAP) * 100).toFixed(1) + '%';
+  document.getElementById('projected-total').textContent = projectedTotal > 0
+    ? '~$' + projectedTotal.toLocaleString() : '—';
+  document.getElementById('gap-coverage').textContent = gap > 0
+    ? ((totalCollected / gap) * 100).toFixed(1) + '%' : '—';
+  document.getElementById('gap-sub').textContent = gap > 0
+    ? `of $${gap.toLocaleString()} portfolio gap` : 'Set goal on Dashboard to track';
 
-  // Progress bars
-  const rklbPct = Math.min((rklbCollected / RKLB_TARGET) * 100, 100);
-  const okloPct = Math.min((okloCollected / OKLO_TARGET) * 100, 100);
-  const dkngPct = Math.min((dkngCollected / DKNG_TARGET) * 100, 100);
-  document.getElementById('rklb-bar').style.width = rklbPct + '%';
-  document.getElementById('oklo-bar').style.width = okloPct + '%';
-  document.getElementById('tsla-bar').style.width = dkngPct + '%';  // reuses dkng bar el
-  document.getElementById('rklb-progress-label').textContent =
-    `$${rklbCollected.toLocaleString()} / $${RKLB_TARGET.toLocaleString()} collected`;
-  document.getElementById('oklo-progress-label').textContent =
-    `$${okloCollected.toLocaleString()} / $${OKLO_TARGET.toLocaleString()} collected`;
-  document.getElementById('dkng-progress-label').textContent =
-    `$${dkngCollected.toLocaleString()} / $${DKNG_TARGET.toLocaleString()} collected`;
+  // Dynamic per-ticker progress bars
+  const progressWrap = document.getElementById('premium-progress-container');
+  const colors = [
+    'linear-gradient(90deg,#0ea5e9,#22d3ee)',
+    'linear-gradient(90deg,#d97706,#f59e0b)',
+    'linear-gradient(90deg,#a855f7,#e879f9)',
+    'linear-gradient(90deg,#22c55e,#6ee7b7)',
+    'linear-gradient(90deg,#f87171,#fca5a5)',
+  ];
+  const tickerList = Object.keys(perTicker).sort((a, b) => perTicker[b].collected - perTicker[a].collected);
+  if (tickerList.length > 0) {
+    progressWrap.innerHTML = tickerList.map((t, i) => {
+      const { collected } = perTicker[t];
+      const target = resolvedTargets[t];
+      const pct = Math.min((collected / target) * 100, 100);
+      return `
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:5px;">
+            <span style="color:#c9d4e8;">${t} — ${perTicker[t].count} cycle${perTicker[t].count === 1 ? '' : 's'} logged</span>
+            <span style="color:#22d3ee;">$${collected.toLocaleString()} / $${target.toLocaleString()} collected</span>
+          </div>
+          <div class="prog-track"><div class="prog-fill" style="width:${pct.toFixed(1)}%;background:${colors[i % colors.length]};border-radius:999px;height:100%;transition:width .5s ease;"></div></div>
+          <div class="prog-labels"><span>$0</span><span>$${target.toLocaleString()}</span></div>
+        </div>`;
+    }).join('');
+  } else {
+    progressWrap.innerHTML = `<div style="color:#5a6a8a;font-size:0.82rem;font-style:italic;padding:8px 0;">Log covered call cycles below to see per-ticker progress bars here.</div>`;
+  }
 
-  // Pace analysis
+  // Pace analysis (generic)
   const avgPerCycle = completedCount > 0 ? completedSum / completedCount : totalCollected;
-  const rklbLogged  = cycles.filter(c => c.ticker === 'RKLB').length;
-  const remaining   = Math.max(0, RKLB_CYCLES - completedCount);
-  const projRklb    = rklbCollected + (remaining * avgPerCycle);
-  const combined    = projRklb + OTHER_TARGET;
-  const onTrack     = combined >= GAP;
+  const plannedCycles = DEFAULT_CYCLES * Math.max(tickerList.length, 1);
+  const remaining   = Math.max(0, plannedCycles - completedCount);
+  const projTotal   = totalCollected + (remaining * avgPerCycle);
+  const onTrack     = gap > 0 ? projTotal >= gap : true;
 
   document.getElementById('pace-logged').textContent    = cycles.length;
   document.getElementById('pace-avg').textContent       = completedCount > 0
     ? '$' + Math.round(completedSum / completedCount).toLocaleString() + ' / cycle'
     : 'No completed cycles yet';
   document.getElementById('pace-remaining-rklb').textContent = remaining;
-  document.getElementById('pace-proj-rklb').textContent = '~$' + Math.round(projRklb).toLocaleString();
-  document.getElementById('pace-combined').textContent  = '~$' + Math.round(combined).toLocaleString();
-  document.getElementById('pace-ontrack').textContent   = onTrack
-    ? '✅ Yes — premium alone projects to close gap'
-    : '⚠️ Below pace — may need to supplement with gains';
+  document.getElementById('pace-proj-rklb').textContent = '~$' + Math.round(projTotal).toLocaleString();
+  document.getElementById('pace-combined').textContent  = '~$' + Math.round(projTotal).toLocaleString();
+  document.getElementById('pace-ontrack').textContent   = gap <= 0
+    ? '—  Set goal on Dashboard to evaluate'
+    : onTrack
+      ? '✅ Yes — premium alone projects to close gap'
+      : '⚠️ Below pace — may need to supplement with gains';
   document.getElementById('pace-ontrack').style.color   = onTrack ? '#22c55e' : '#f59e0b';
 
   // Redraw chart whenever data changes
@@ -387,11 +415,31 @@ function render() {
 }
 
 // ── Modal ────────────────────────────────────────────────────────────
+function populateTickerDropdown(selected) {
+  const sel = document.getElementById('f-ticker');
+  if (!sel) return;
+  const holdings = JSON.parse(localStorage.getItem('custom_holdings') || '[]');
+  const tickers = holdings.map(h => h.ticker).filter(Boolean);
+  sel.innerHTML = '';
+  if (!tickers.length) {
+    const opt = document.createElement('option');
+    opt.value = ''; opt.textContent = '— Add a holding on the Dashboard first —';
+    sel.appendChild(opt);
+    return;
+  }
+  tickers.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    if (selected === t) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
 function openAddModal() {
   document.getElementById('modal-title').textContent = 'Log New Cycle';
   document.getElementById('edit-index').value = -1;
-  document.getElementById('f-ticker').value    = 'RKLB';
-  document.getElementById('f-contracts').value = 5;
+  populateTickerDropdown();
+  document.getElementById('f-contracts').value = 1;
   document.getElementById('f-strike').value    = '';
   document.getElementById('f-premium').value   = '';
   document.getElementById('f-open').value      = today();
@@ -406,6 +454,7 @@ function openEditModal(i) {
   const c = cycles[i];
   document.getElementById('modal-title').textContent = `Edit Cycle ${i + 1}`;
   document.getElementById('edit-index').value        = i;
+  populateTickerDropdown(c.ticker);
   document.getElementById('f-ticker').value          = c.ticker;
   document.getElementById('f-contracts').value       = c.contracts;
   document.getElementById('f-strike').value          = c.strike;
@@ -504,8 +553,11 @@ function drawCumulativeChart() {
   const endMs   = new Date('2026-12-31').getTime();
   const totalMs = endMs - startMs;
 
-  const TOTAL_TARGET = 33600;
-  const RKLB_TARGET_LINE = 21600;
+  // Dynamic total target — sum of per-ticker CC targets from localStorage
+  // Falls back to gap-to-goal or a sensible default if unset.
+  const ccTargets = loadCcTargets();
+  let TOTAL_TARGET = Object.values(ccTargets).reduce((s, v) => s + (v || 0), 0);
+  if (TOTAL_TARGET <= 0) TOTAL_TARGET = Math.max(loadGap(), 10000);
 
   function xFor(dateStr) {
     const ms = new Date(dateStr).getTime();
@@ -515,11 +567,15 @@ function drawCumulativeChart() {
     return PAD.top + cH - (val / TOTAL_TARGET) * cH;
   }
 
-  // Grid lines
-  const gridAmounts = [0, 5000, 10000, 15000, RKLB_TARGET_LINE, 25000, 30000, TOTAL_TARGET];
+  // Grid lines — evenly spaced to TOTAL_TARGET
+  const step = Math.max(Math.round(TOTAL_TARGET / 6 / 1000) * 1000, 1000);
+  const gridAmounts = [];
+  for (let g = 0; g <= TOTAL_TARGET; g += step) gridAmounts.push(g);
+  if (gridAmounts[gridAmounts.length - 1] !== TOTAL_TARGET) gridAmounts.push(TOTAL_TARGET);
+
   gridAmounts.forEach(g => {
     const y = yFor(g);
-    const isKey = g === RKLB_TARGET_LINE || g === TOTAL_TARGET;
+    const isKey = g === TOTAL_TARGET;
     ctx.strokeStyle = isKey ? '#1a2a44' : '#0e1424';
     ctx.lineWidth   = isKey ? 1.5 : 1;
     ctx.setLineDash(isKey ? [5, 4] : []);
@@ -529,7 +585,7 @@ function drawCumulativeChart() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = isKey ? (g === RKLB_TARGET_LINE ? '#22d3ee' : '#c084fc') : '#2a3a5a';
+    ctx.fillStyle = isKey ? '#c084fc' : '#2a3a5a';
     ctx.font = isKey ? 'bold 10px system-ui' : '10px system-ui';
     ctx.textAlign = 'right';
     ctx.fillText('$' + (g/1000).toFixed(0) + 'K', PAD.left - 5, y + 3.5);
